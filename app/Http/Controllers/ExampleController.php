@@ -17,7 +17,7 @@ use OpenApi\Attributes as OAT;
 
 #[
     OAT\PathItem(
-        path: '/admin/tests/{id}',
+        path: '/admin/admin/{id}',
         parameters: [
             new OAT\PathParameter(
                 ref: '#/components/parameters/ExampleIdPathParameter',
@@ -37,7 +37,7 @@ class ExampleController extends Controller
         //
     }
 
-    #[OAT\Get(path: '/admin/tests', tags: ['tests'])]
+    #[OAT\Get(path: '/admin/tests/list', tags: ['tests'])]
     #[SuccessListResponse(User::class)]
     public function get_success_list()
     {
@@ -47,6 +47,7 @@ class ExampleController extends Controller
     #[OAT\Get(path: '/admin/tests/queryParameters', tags: ['tests'])]
     #[QueryParameter('name')]
     #[ListQueryParameter()]
+    #[SuccessItemResponse(User::class)]
     public function get_query_parameters(ExampleQueryParameterData $query_parameters)
     {
         return [];
@@ -83,7 +84,7 @@ class ExampleController extends Controller
 
     #[OAT\Delete(path: '/admin/tests/{id}', tags: ['tests'])]
     #[SuccessNoContentResponse('Item Deleted Successfully')]
-    public function delete(ExampledPathParameterData $path_parameters)
+    public function delete_json(ExampledPathParameterData $path_parameters)
     {
 
     }

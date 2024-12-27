@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\Locale;
 use App\Http\Middleware\ParseStringToBoolInQueryParameter;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;

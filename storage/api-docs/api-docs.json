@@ -1,0 +1,565 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "In Abstract Controller",
+        "version": "1"
+    },
+    "paths": {
+        "/admin/admin/{id}": {
+            "parameters": [
+                {
+                    "$ref": "#/components/parameters/ExampleIdPathParameter"
+                }
+            ]
+        },
+        "/admin/users": {
+            "get": {
+                "tags": [
+                    "admins"
+                ],
+                "operationId": "60abfa1474bf57a132f8180ff927722f",
+                "responses": {
+                    "200": {
+                        "description": "Item fetched successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "1"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/sanctum/csrf-cookie": {
+            "get": {
+                "tags": [
+                    "sanctum"
+                ],
+                "summary": "Get Token",
+                "operationId": "bdcf16ea76658023991a1a7b0d87f89d",
+                "responses": {
+                    "200": {
+                        "description": "csrf cookie set",
+                        "headers": {
+                            "Set-Cookie": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/auth/login": {
+            "post": {
+                "tags": [
+                    "auth"
+                ],
+                "operationId": "6a79aabfd077d1c18f803074e3c11afb",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/adminLogin"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "User logged in successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/adminLoginResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "User name and password or incorrect",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LoginFailedResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/auth/logout": {
+            "post": {
+                "tags": [
+                    "auth"
+                ],
+                "operationId": "6121f7e28a200ed5d837b4e609524ba2",
+                "responses": {
+                    "200": {
+                        "description": "The User was successfully logged out",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/tests": {
+            "get": {
+                "tags": [
+                    "tests"
+                ],
+                "summary": "Display a listing of the resource.",
+                "operationId": "dcbe18c45b7d76d520ddece6e564edfa",
+                "responses": {
+                    "200": {
+                        "description": "Item fetched successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "1"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "tests"
+                ],
+                "operationId": "dbbbf6003783b8e844ae6dd103a4e73b",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "App\\Models\\User"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "User created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/tests/list": {
+            "get": {
+                "tags": [
+                    "tests"
+                ],
+                "operationId": "75fa6e058e992a533ff8eb68ac408985",
+                "responses": {
+                    "200": {
+                        "description": "Items fetched successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "App\\Models\\User"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/tests/queryParameters": {
+            "get": {
+                "tags": [
+                    "tests"
+                ],
+                "operationId": "1257b14a4a09aab00329a81fdf8115d9",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "ids[]",
+                        "in": "query",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Item fetched successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "App\\Models\\User"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/tests/form_data": {
+            "post": {
+                "tags": [
+                    "tests"
+                ],
+                "operationId": "f74df02a3bc925601627c44ed38d2400",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "App\\Models\\User"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "User successfully created",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/tests/{id}": {
+            "get": {
+                "tags": [
+                    "tests"
+                ],
+                "operationId": "6a2ea5cf4020503e0810ca4af04f8d41",
+                "responses": {
+                    "200": {
+                        "description": "Fetched item successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "App\\Models\\User"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "tests"
+                ],
+                "operationId": "02f50af16ca79540c0f6116b6117ffa5",
+                "responses": {
+                    "204": {
+                        "description": "Item Deleted Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "tests"
+                ],
+                "operationId": "0cbccc23b47b87ec3e9da89ef42c3b30",
+                "responses": {
+                    "204": {
+                        "description": "Update User Successfuly",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/files": {
+            "get": {
+                "tags": [
+                    "files"
+                ],
+                "operationId": "5f5d7a9f14764b7a00b1a6d263730e0a",
+                "responses": {
+                    "204": {
+                        "description": "File uploaded successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/files": {
+            "post": {
+                "tags": [
+                    "files"
+                ],
+                "operationId": "08f811d5e879722f476c4451e5d3c8ae",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UploadFileData"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "File uploaded successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UploadFileResponseData"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "adminLogin": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "default": "admin"
+                    },
+                    "password": {
+                        "type": "string",
+                        "default": "admin"
+                    }
+                },
+                "type": "object"
+            },
+            "adminLoginResponse": {
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "CreateFilePathData": {
+                "properties": {
+                    "url": {
+                        "type": "string"
+                    },
+                    "public_id": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "FilePathData": {
+                "properties": {
+                    "url": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "ShowFileData": {
+                "properties": {
+                    "uid": {
+                        "type": "integer"
+                    },
+                    "url": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateFileData": {
+                "properties": {
+                    "uid": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "url": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "UploadFileData": {
+                "properties": {
+                    "file": {
+                        "type": "string",
+                        "format": "binary"
+                    }
+                },
+                "type": "object"
+            },
+            "UploadFileResponseData": {
+                "properties": {
+                    "url": {
+                        "type": "string"
+                    },
+                    "public_id": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "ListData": {
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "title": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "LoginFailedResponse": {
+                "properties": {
+                    "message": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "SingleMedia": {
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "file_url": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "adminCursorPaginatedAbstract": {
+                "properties": {
+                    "per_page": {
+                        "type": "integer"
+                    },
+                    "next_cursor": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "adminPaginatedAbstract": {
+                "properties": {
+                    "current_page": {
+                        "type": "integer"
+                    },
+                    "per_page": {
+                        "type": "integer"
+                    },
+                    "total": {
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "Gender": {
+                "description": "[0 => Male, 1 => Female]",
+                "type": "integer",
+                "enum": [
+                    0,
+                    1
+                ]
+            }
+        },
+        "parameters": {
+            "ExampleIdPathParameter": {
+                "name": "id",
+                "in": "path",
+                "required": true,
+                "schema": {
+                    "type": "integer"
+                }
+            },
+            "localeQueryParameter": {
+                "name": "locale",
+                "in": "query",
+                "required": false,
+                "schema": {
+                    "type": "string"
+                }
+            }
+        },
+        "securitySchemes": {
+            "ref_to_be_used_below_csrf": {
+                "type": "apiKey",
+                "name": "X-XSRF-TOKEN",
+                "in": "header"
+            }
+        }
+    },
+    "security": [
+        {
+            "ref_to_be_used_below_csrf": []
+        }
+    ],
+    "tags": [
+        {
+            "name": "auth"
+        },
+        {
+            "name": "admins",
+            "description": "admins"
+        },
+        {
+            "name": "sanctum",
+            "description": "sanctum"
+        },
+        {
+            "name": "tests",
+            "description": "tests"
+        },
+        {
+            "name": "files",
+            "description": "files"
+        }
+    ]
+}

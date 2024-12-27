@@ -1,5 +1,7 @@
 <?php
 
+use App\Libs\Ide_helper\AddPivotDocHook;
+
 return [
 
     /*
@@ -168,7 +170,7 @@ return [
 
     'model_hooks' => [
         // App\Support\IdeHelper\MyModelHook::class
-        'App\AddPivotDocHook',
+        AddPivotDocHook::class,
     ],
 
     /*

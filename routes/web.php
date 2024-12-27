@@ -22,13 +22,18 @@ Route::prefix('admin')
             //auth:sanctum check if user is logged in (middleware('auth')),
             ->group(function () {
 
-                Route::prefix('admin')
+                Route::prefix('tests')
                     ->group(function () {
                         Route::get('', [ExampleController::class, 'index']);
-                        Route::get('{id}', [ExampleController::class, 'show']);
+                        Route::get('{id}', [ExampleController::class, 'show_item']);
 
-                        Route::delete('{id}', [ExampleController::class, 'destroy']);
-                        Route::patch('{id}', [ExampleController::class, 'update']);
+                        Route::get('queryParameters', [ExampleController::class, 'get_query_parameters']);
+
+                        Route::post('post_json', [ExampleController::class, 'post_json']);
+
+
+                        Route::patch('{id}', [ExampleController::class, 'patch_json']);
+                        Route::delete('{id}', [ExampleController::class, 'delete_json']);
 
                     });
 

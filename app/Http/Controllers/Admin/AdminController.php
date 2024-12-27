@@ -8,13 +8,11 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OAT;
 
-#[OAT\Get(path: '/admin/users', tags: ['users'])]
-#[SuccessItemResponse(true)]
 class AdminController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
+    #[OAT\Get(path: '/admin/users', tags: ['admins'])]
+    #[SuccessItemResponse(true)]
     public function index()
     {
         //
