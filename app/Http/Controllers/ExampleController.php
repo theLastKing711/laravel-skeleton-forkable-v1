@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Data\Example\ExampleCursorPaginationRequetData;
+use App\Data\Example\ExampleData;
 use App\Data\Example\PathParameters\ExampledPathParameterData;
 use App\Data\Example\QueryParameters\ExampleQueryParameterData;
 use App\Data\Shared\Swagger\Parameter\QueryParameter\ListQueryParameter;
@@ -13,7 +15,7 @@ use App\Data\Shared\Swagger\Response\SuccessListResponse;
 use App\Data\Shared\Swagger\Response\SuccessNoContentResponse;
 use App\Models\User;
 use OpenApi\Attributes as OAT;
-
+use phpDocumentor\Reflection\DocBlock\Tags\Example;
 
 #[
     OAT\PathItem(
@@ -38,46 +40,62 @@ class ExampleController extends Controller
     }
 
     #[OAT\Get(path: '/admin/tests/list', tags: ['tests'])]
-    #[SuccessListResponse(User::class)]
+    #[SuccessListResponse(ExampleData::class)]
     public function get_success_list()
     {
-        //
+        return ExampleData::collect([]);
     }
 
     #[OAT\Get(path: '/admin/tests/queryParameters', tags: ['tests'])]
     #[QueryParameter('name')]
     #[ListQueryParameter()]
-    #[SuccessItemResponse(User::class)]
+    #[SuccessItemResponse(ExampleData::class)]
     public function get_query_parameters(ExampleQueryParameterData $query_parameters)
     {
-        return [];
+        return ExampleData::from([]);
+    }
+
+    #[OAT\Get(path: '/admin/tests/cursorPagination', tags: ['tests'])]
+    #[QueryParameter('name')]
+    #[SuccessItemResponse(ExampleCursorPaginationRequetData::class)]
+    public function get_cursor_pagination(ExampleQueryParameterData $query_parameters)
+    {
+
+        $users =
+            User::query()
+                ->cursorPaginate(15);
+
+        // can apply transformation using fromModel
+        //or else while preserving the wrapper data field and others.
+        return ExampleQueryParameterData::collect($users);
     }
 
     #[OAT\Post(path: '/admin/tests', tags: ['tests'])]
-    #[JsonRequestBody(User::class)]
+    #[JsonRequestBody(ExampleData::class)]
     #[SuccessNoContentResponse('User created successfully')]
-    public function post_json(User $user)
+    public function post_json(ExampleData $data)
     {
         //
     }
 
     #[OAT\Post(path: '/admin/tests/form_data', tags: ['tests'])]
-    #[FormDataRequestBody(User::class)]
+    #[FormDataRequestBody(ExampleData::class)]
     #[SuccessNoContentResponse('User successfully created')]
-    public function post_form_data(User $user)
+    public function post_form_data(ExampleData $user)
     {
     }
 
     #[OAT\Get(path: '/admin/tests/{id}', tags: ['tests'])]
-    #[SuccessItemResponse(User::class, 'Fetched item successfully')]
+    #[SuccessItemResponse(ExampleData::class, 'Fetched item successfully')]
     public function show_item(ExampledPathParameterData $request)
     {
 
     }
 
     #[OAT\Patch(path: '/admin/tests/{id}', tags: ['tests'])]
+    #[FormDataRequestBody(ExampleData::class)]
     #[SuccessNoContentResponse('Update User Successfuly')]
-    public function patch_json(ExampledPathParameterData $path_parameters, User $user)
+    public function patch_json(ExampledPathParameterData $path_parameters, ExampleData $user)
     {
 
     }

@@ -143,7 +143,7 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "type": "App\\Models\\User"
+                                "$ref": "#/components/schemas/ExampleData"
                             }
                         }
                     }
@@ -174,7 +174,7 @@
                                 "schema": {
                                     "type": "array",
                                     "items": {
-                                        "type": "App\\Models\\User"
+                                        "$ref": "#/components/schemas/ExampleData"
                                     }
                                 }
                             }
@@ -214,7 +214,36 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "App\\Models\\User"
+                                    "$ref": "#/components/schemas/ExampleData"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/tests/cursorPagination": {
+            "get": {
+                "tags": [
+                    "tests"
+                ],
+                "operationId": "db329ec8a036017d152cb32c5cfbf7df",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Item fetched successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ExampleCursorPaginationRequetData"
                                 }
                             }
                         }
@@ -233,7 +262,7 @@
                     "content": {
                         "multipart/form-data": {
                             "schema": {
-                                "type": "App\\Models\\User"
+                                "$ref": "#/components/schemas/ExampleData"
                             }
                         }
                     }
@@ -262,7 +291,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "App\\Models\\User"
+                                    "$ref": "#/components/schemas/ExampleData"
                                 }
                             }
                         }
@@ -290,6 +319,16 @@
                     "tests"
                 ],
                 "operationId": "0cbccc23b47b87ec3e9da89ef42c3b30",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ExampleData"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "204": {
                         "description": "Update User Successfuly",
@@ -379,6 +418,39 @@
                     },
                     "created_at": {
                         "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "ExampleCursorPaginationRequetData": {
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/adminCursorPaginatedAbstract"
+                    },
+                    {
+                        "properties": {
+                            "data": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/ExampleData"
+                                }
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "ExampleData": {
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "ids": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
                     }
                 },
                 "type": "object"
