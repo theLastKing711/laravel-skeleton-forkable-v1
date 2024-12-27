@@ -18,7 +18,6 @@ Route::prefix('admin')
     ->group(function () {
         $adminRole = RolesEnum::ADMIN->value;
 
-        //use before login to bypass csrf token
         Route::middleware(['auth:sanctum', "role:{$adminRole}"])
             //auth:sanctum check if user is logged in (middleware('auth')),
             ->group(function () {

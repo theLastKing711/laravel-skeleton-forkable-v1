@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Interfaces\Mediable;
 use Barryvdh\LaravelIdeHelper\Eloquent;
+use CloudinaryLabs\CloudinaryLaravel\MediaAlly;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Notifications\Notifiable;
@@ -15,7 +16,7 @@ use Spatie\Permission\Traits\HasRoles;
 class ExampleModel extends Eloquent implements Mediable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable, HasRoles, MediaAlly;
 
     public function medially(): MorphMany
     {
