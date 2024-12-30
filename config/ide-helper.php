@@ -1,6 +1,7 @@
 <?php
 
-use App\Libs\Ide_helper\AddPivotDocHook;
+use App\Libs\IdeHelper\ModelHooks\AddPivotDocHook;
+use App\Libs\IdeHelper\ModelHooks\EloquentPowerJoins;
 
 return [
 
@@ -171,6 +172,7 @@ return [
     'model_hooks' => [
         // App\Support\IdeHelper\MyModelHook::class
         AddPivotDocHook::class,
+        EloquentPowerJoins::class
     ],
 
     /*

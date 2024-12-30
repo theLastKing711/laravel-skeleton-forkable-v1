@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Libs\Ide_helper;
+namespace App\Libs\IdeHelper\ModelHooks;
 
 use App\Data\Shared\ModelwithPivotCollection;
 use Barryvdh\LaravelIdeHelper\Console\ModelsCommand;
