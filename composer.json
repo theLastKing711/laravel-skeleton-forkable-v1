@@ -16,7 +16,8 @@
         "laravel/tinker": "^2.9",
         "spatie/laravel-data": "^4.6",
         "spatie/laravel-permission": "^6.7",
-        "spatie/laravel-typescript-transformer": "^2.4"
+        "spatie/laravel-typescript-transformer": "^2.4",
+        "kirschbaum-development/eloquent-power-joins": "^4.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.14",

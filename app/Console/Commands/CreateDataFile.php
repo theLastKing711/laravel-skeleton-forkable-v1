@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Log;
 
 class CreateDataFile extends Command
 {
@@ -12,7 +11,7 @@ class CreateDataFile extends Command
      *
      * @var string
      */
-    protected $signature = 'make:data {name}';
+    protected $signature = 'make:data {name} {--path}';
 
     /**
      * The console command description.
@@ -27,7 +26,7 @@ class CreateDataFile extends Command
     public function handle()
     {
 
-        /** @var string $path  */
+        /** @var string $path */
         $path =
             str_replace(
                 '/',
@@ -35,49 +34,100 @@ class CreateDataFile extends Command
                 $this->argument('name')
             );
 
-        // Log::info($path);
-
-
-        $class_name=
+        $class_name =
             explode(
                 '\\',
                 $path
             );
 
-            $this->info($path);
+        $augmented_path =
+            explode(
+                '\\',
+                $path
+            );
 
+        array_splice($augmented_path, -1, 1);
 
-            $this->info($class_name[0]);
+        $real_path = implode('\\', $augmented_path);
 
+        if ($this->option('path')) {
 
+            $file_class_name =
+                $class_name[count($class_name) - 1].'PathParameterData';
+
+            $fileContents = <<<EOT
+            <?php
+
+            namespace App\Data\\$real_path;
+
+            use Spatie\LaravelData\Attributes\Validation\Exists;
+            use Spatie\LaravelData\Data;
+            use OpenApi\Attributes as OAT;
+            use Spatie\LaravelData\Attributes\FromRouteParameter;
+
+            class $file_class_name extends Data
+            {
+                public function __construct(
+                    #[
+                        OAT\PathParameter(
+                            parameter: 'testIdPathParameter', //the name used in ref
+                            name: 'id',
+                            schema: new OAT\Schema(
+                                type: 'integer',
+                            ),
+                        ),
+                        FromRouteParameter('id'),
+                        Exists('tests', 'id')
+                    ]
+                    public int \$id,
+                ) {
+                }
+            }
+
+            EOT;
+
+            $written = \Storage::disk('app')
+                ->put('Data'.'\\'.$this->argument('name').'PathParameterData.php', $fileContents);
+
+            if ($written) {
+                $this->info('Created new Repo '.$this->argument('name').'Repository.php in App\Repositories.');
+            } else {
+                $this->info('Something went wrong');
+            }
+
+            return;
+        }
+
+        $file_class_name =
+                $class_name[count($class_name) - 1].'Data';
         $fileContents = <<<EOT
         <?php
 
-        namespace App\Data\\$path;
+        namespace App\Data\\$real_path;
 
         use Spatie\LaravelData\Data;
         use Spatie\TypeScriptTransformer\Attributes\TypeScript;
         use OpenApi\Attributes as OAT;
 
         #[TypeScript]
-        class $class_name[0] extends Data
+        #[Oat\Schema()]
+        class $file_class_name extends Data
         {
-            public function __construct()
-            {
+            public function __construct(
 
-            }
+            ) {}
+
         }
 
         EOT;
 
+        $written = \Storage::disk('app')
+            ->put('Data'.'\\'.$this->argument('name').'Data.php', $fileContents);
 
-        $written = \Storage::disk('app')->put('Data'.'\\' .$this->argument('name') . 'Data.php', $fileContents);
-
-
-        // if($written) {
-        //     $this->info('Created new Repo '.$this->argument('name').'Repository.php in App\Repositories.');
-        // } else {
-        //     $this->info('Something went wrong');
-        // }
+        if ($written) {
+            $this->info('Created new Repo '.$this->argument('name').'Repository.php in App\Repositories.');
+        } else {
+            $this->info('Something went wrong');
+        }
     }
 }

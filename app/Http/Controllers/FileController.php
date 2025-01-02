@@ -7,7 +7,7 @@ use App\Data\Shared\File\UploadFileResponseData;
 use App\Data\Shared\Swagger\Request\FormDataRequestBody;
 use App\Data\Shared\Swagger\Response\SuccessItemResponse;
 use App\Data\Shared\Swagger\Response\SuccessNoContentResponse;
-use Cloudinary;
+use Cloudinary\Cloudinary;
 use Illuminate\Support\Facades\Log;
 use OpenApi\Attributes as OAT;
 
