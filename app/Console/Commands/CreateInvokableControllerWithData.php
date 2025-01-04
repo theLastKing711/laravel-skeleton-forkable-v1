@@ -43,7 +43,9 @@ class CreateInvokableControllerWithData extends Command
 
         $tag = strtolower(
             $class_name[0]
-        ).'s';
+        ).'s'
+        .$class_name[1]
+        .'s';
 
         $main_route =
         strtolower(
