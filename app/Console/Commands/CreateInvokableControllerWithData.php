@@ -414,7 +414,7 @@ class CreateInvokableControllerWithData extends Command
             class $file_class_name extends Controller
             {
 
-                #[OAT\Get(path: '/$main_route/{id}', tags: ['$tag'])]
+                #[OAT\Get(path: '/$main_route', tags: ['$tag'])]
                 #[SuccessListResponse($get_many_data_name)]
                 public function __invoke($query_variable_declaration)
                 {
