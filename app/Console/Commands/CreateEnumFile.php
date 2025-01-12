@@ -37,7 +37,7 @@ class CreateEnumFile extends Command
             #[OAT\Schema]
             enum $class_name: int
             {
-                case TestCase = 0;
+                case TestCase = 1;
 
                 public function label(): string
                 {
