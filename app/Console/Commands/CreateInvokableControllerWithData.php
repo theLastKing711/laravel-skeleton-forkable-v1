@@ -12,7 +12,7 @@ class CreateInvokableControllerWithData extends Command
      *
      * @var string
      */
-    protected $signature = 'make:data-controller {name} {--path==} {--query==} {--post==} {--post-form==} {--patch==} {--patch-form==} {--get-one==} {--get-many==} {--delete-one} {--delete-many==}';
+    protected $signature = 'make:data-controller {name} {--path==} {--query==} {--post==} {--post-form==} {--patch==} {--patch-form==} {--get-one==} {--get-many==} {--delete-one} {--delete-many==} {--pagination==} ';
 
     /**
      * The console command description.
@@ -26,7 +26,6 @@ class CreateInvokableControllerWithData extends Command
      */
     public function handle()
     {
-
         /** @var string $path */
         $path =
             str_replace(
@@ -238,6 +237,46 @@ class CreateInvokableControllerWithData extends Command
 
         if ($patch_option) {
 
+            if ($patch_option == 'null') {
+
+                $fileContents = <<<EOT
+                <?php
+
+                namespace App\Http\Controller\\$real_path;
+
+                use App\Http\Controllers\Controller;
+                use App\Data\Shared\Swagger\Response\SuccessNoContentResponse;
+                use OpenApi\Attributes as OAT;
+
+                #[
+                    OAT\PathItem(
+                        path: '/$main_route/{id}',
+                        parameters: [
+                            new OAT\PathParameter(
+                                ref: '#/components/parameters/$path_ref',
+                            ),
+                        ],
+                    ),
+                ]
+                class $file_class_name extends Controller
+                {
+
+                    #[OAT\Patch(path: '/$main_route/{id}', tags: ['$tag'])]
+                    #[SuccessNoContentResponse]
+                    public function __invoke($path_variable_declaration)
+                    {
+
+                    }
+                }
+
+                EOT;
+
+                $written = \Storage::disk('app')
+                    ->put('Http\Controllers'.'\\'.$this->argument('name').'Controller.php', $fileContents);
+
+                return;
+            }
+
             $patch_path =
                 str_replace(
                     '/',
@@ -285,7 +324,7 @@ class CreateInvokableControllerWithData extends Command
             class $file_class_name extends Controller
             {
 
-                #[OAT\Patch(path: /$main_route/{id}', tags: ['$tag'])]
+                #[OAT\Patch(path: '/$main_route/{id}', tags: ['$tag'])]
                 #[JsonRequestBody($patch_data_name)]
                 #[SuccessNoContentResponse]
                 public function __invoke($path_variable_declaration $patch_data_class \$request)
@@ -394,11 +433,74 @@ class CreateInvokableControllerWithData extends Command
                 $get_many_path,
             );
 
+            $get_many_data_class_without_data =
+                $get_many_option_array[count($get_many_option_array) - 1];
+
             $get_many_data_class =
-                $get_many_option_array[count($get_many_option_array) - 1].'Data';
+                $get_many_data_class_without_data.'Data';
 
             $get_many_data_name =
                 $get_many_data_class.'::class';
+
+            $get_many_final_name = $get_many_path.'Data';
+
+            $this->info($this->option('pagination'));
+
+            if ($this->option('pagination')) {
+
+                $get_many_data_name = $get_many_data_class.
+
+                $this->info('hello worlds');
+                $query_option = $this->argument('name');
+
+                $query_parameter_file_name = $input_file_name.'QueryParameterData';
+
+                $pagination_class =
+                    $get_many_data_class_without_data.'PaginationResultData';
+
+                $pagination_path = $get_many_path.'PaginationResultData';
+
+                $fileContents = <<<EOT
+                <?php
+
+                namespace App\Http\Controllers\\$real_path;
+
+                use App\Data\\$real_path\\QueryParameters\\$query_parameter_file_name;
+                use App\Http\Controllers\Controller;
+                use App\Data\Shared\Swagger\Parameter\QueryParameter\QueryParameter;
+                use App\Data\\$pagination_path;
+                use App\Data\Shared\Swagger\Response\SuccessItemResponse;
+                use OpenApi\Attributes as OAT;
+
+                class $file_class_name extends Controller
+                {
+
+                    #[OAT\Get(path: '/$main_route', tags: ['$tag'])]
+                    #[QueryParameter('page', 'integer')]
+                    #[QueryParameter('perPage', 'integer')]
+                    #[SuccessItemResponse($pagination_class::class)]
+                    public function __invoke($query_parameter_file_name \$request)
+                    {
+
+                    }
+                }
+
+                EOT;
+
+                $written = \Storage::disk('app')
+                    ->put('Http\Controllers'.'\\'.$this->argument('name').'Controller.php', $fileContents);
+
+                Artisan::call('make:data', [
+                    'name' => $get_many_option,
+                    '--pagination' => 'default',
+                ]);
+
+                Artisan::call('make:data', [
+                    'name' => $get_many_option,
+                ]);
+
+                return;
+            }
 
             $get_many_final_name = $get_many_path.'Data';
 
@@ -695,7 +797,7 @@ class CreateInvokableControllerWithData extends Command
             class $file_class_name extends Controller
             {
 
-                #[OAT\Get(path: ''/$main_route', tags: ['$tag'])]
+                #[OAT\Get(path: '/$main_route', tags: ['$tag'])]
                 public function __invoke()
                 {
 
