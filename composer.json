@@ -49,6 +49,7 @@
         "swagger": "php artisan l5-swagger:generate",
         "phpdocs": "php artisan ide-helper:generate && php artisan ide-helper:models  && php artisan ide-helper:meta",
         "github": "git add . && git commit -m 'a' && git push origin main",
+        "typescript": "php artisan typescript:transform",
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"

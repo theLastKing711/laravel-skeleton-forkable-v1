@@ -167,6 +167,7 @@ class CreateDataFile extends Command
             use Illuminate\Support\Collection;
             use OpenApi\Attributes as OAT;
 
+            #[TypeScript]
             #[Oat\Schema()]
             class $file_class_name  extends PaginationResultData
             {
