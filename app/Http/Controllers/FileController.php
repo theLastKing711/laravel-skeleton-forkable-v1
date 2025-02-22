@@ -68,39 +68,59 @@ class FileController extends Controller
         // 'effect' => ['bgremoval|make_transparent'] to remove background  is bad and doesn't work
         $result = Cloudinary::upload($file_path, [
             'eager' => [ //list of transformation objects -> https://cloudinary.com/documentation/transformation_reference
-                //here we upload and get x images for the provided file_path in response where x is number of objects in below array
-                // [
-                //     'width' => 90,
-                // ],
                 [
                     'width' => 500,
-                    'height' => 500,
+                    // 'height' => 500,
                     'crop' => 'pad',
                     // 'pad',
                     // 'scale' => 'auto',
                 ],
-                // [
-                //     'width' => 700,
-                //     // 'pad',
-                //     // 'scale' => 'auto',
-                // ],
-                //             "width": 700,
-                //   "height": 1941,
-                //   "bytes": 148109,
-                // 'transformation' => [ // transforms the uploaded image and return it with transformations applied to it in response
-                //     // 'quality' => 'auto',
-                // 'width' => 90,
-                //     'effect' => [
-                //         'make_transparent',
-                //         // 'bgremoval',
-                // ],
-                //     // 'height' => 90,
-                // ],
             ],
+            // 'eager' => [ //list of transformation objects -> https://cloudinary.com/documentation/transformation_reference
+            //     //here we upload and get x images for the provided file_path in response where x is number of objects in below array
+            //     // [
+            //     //     'width' => 90,
+            //     // ],
+            //     [
+            //         'width' => 700,
+            //         'height' => 700,
+            //         'crop' => 'pad',
+            //         // 'pad',
+            //         // 'scale' => 'auto',
+            //     ],
+            //     // [
+            //     //     'width' => 700,
+            //     //     // 'pad',
+            //     //     // 'scale' => 'auto',
+            //     // ],
+            //     //             "width": 700,
+            //     //   "height": 1941,
+            //     //   "bytes": 148109,
+            //     // 'transformation' => [ // transforms the uploaded image and return it with transformations applied to it in response
+            //     //     // 'quality' => 'auto',
+            //     // 'width' => 90,
+            //     //     'effect' => [
+            //     //         'make_transparent',
+            //     //         // 'bgremoval',
+            //     // ],
+            //     //     // 'height' => 90,
+            //     // ],
+            // ],
+            // 'transformation' => [
+            //     'width' => 700,
+            //     'quality' => 'auto',
+            // ],
         ]);
 
         // get request response object
-        return $result->getResponse();
+        $response = $result->getResponse();
+
+        return $response;
+
+        return new UploadFileResponseData(
+            url: $eager_file['secure_url'],
+            public_id: $eager_file['secure_url'],
+        );
 
         // the url of the uploaded image -> real image on usage
         //example result: https:cloudinary$pathToImage
@@ -160,11 +180,8 @@ class FileController extends Controller
                 $response = Cloudinary::upload($file_path, [
                     'eager' => [ //list of transformation objects -> https://cloudinary.com/documentation/transformation_reference
                         [
-                            'width' => 90,
-                        ],
-                        [
                             'width' => 500,
-                            'height' => 500,
+                            // 'height' => 500,
                             'crop' => 'pad',
                         ],
                         // [
