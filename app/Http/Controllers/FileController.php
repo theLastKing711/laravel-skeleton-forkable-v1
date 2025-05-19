@@ -11,9 +11,12 @@ use App\Data\Shared\Swagger\Response\SuccessItemResponse;
 use App\Data\Shared\Swagger\Response\SuccessListResponse;
 use App\Data\Shared\Swagger\Response\SuccessNoContentResponse;
 use App\Models\Media;
+use App\Models\TemporaryUploadedImages;
+use App\Models\User;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use OpenApi\Attributes as OAT;
 
@@ -44,30 +47,30 @@ class FileController extends Controller
         $file = $uploadFileData->file;
 
         Log::info(
-            'accessing FileController with files {files}',
+            'accessing FileController store, with files {files}',
             ['files' => $file]
         );
         //        abort(404);
-        Log::info('hello world');
-        Log::info($uploadFileData);
         $file_path = $file->getRealPath();
 
-        //https://cloudinary.com/documentation/image_upload_api_reference#upload_method
-        //https://cloudinary.com/documentation/image_upload_api_reference
-        //https://cloudinary.com/documentation/transformation_reference
-        //https://cloudinary.com/documentation/image_optimization
-        //https://cloudinary.com/documentation/eager_and_incoming_transformations#eager_transformations
-        ///eager which apply multiple transformations on the fly during upload
+        Log::info('file path {file_path}', ['file_path' => $file_path]);
+
+        // https://cloudinary.com/documentation/image_upload_api_reference#upload_method
+        // https://cloudinary.com/documentation/image_upload_api_reference
+        // https://cloudinary.com/documentation/transformation_reference
+        // https://cloudinary.com/documentation/image_optimization
+        // https://cloudinary.com/documentation/eager_and_incoming_transformations#eager_transformations
+        // /eager which apply multiple transformations on the fly during upload
         // and return multiple transformed images, as opposed the transformation
-        //which works only on the main image and return it
+        // which works only on the main image and return it
         // alternative to eager is eager_async,
-        //which apply transformation after upload request is done
+        // which apply transformation after upload request is done
         // when first visited by user i.e end-user using front end
-        //https://cloudinary.com/documentation/transformation_reference
+        // https://cloudinary.com/documentation/transformation_reference
         // if width => value used with quality => auto will be the same as width => value alone
         // 'effect' => ['bgremoval|make_transparent'] to remove background  is bad and doesn't work
         $result = Cloudinary::upload($file_path, [
-            'eager' => [ //list of transformation objects -> https://cloudinary.com/documentation/transformation_reference
+            'eager' => [ // list of transformation objects -> https://cloudinary.com/documentation/transformation_reference
                 [
                     'width' => 500,
                     // 'height' => 500,
@@ -123,7 +126,7 @@ class FileController extends Controller
         );
 
         // the url of the uploaded image -> real image on usage
-        //example result: https:cloudinary$pathToImage
+        // example result: https:cloudinary$pathToImage
         $cloudinary_image_path = $result->getSecurePath();
 
         // unique identifer for the image can
@@ -148,37 +151,45 @@ class FileController extends Controller
 
         $files = $uploadFileData->files;
 
-        /** @var Collection<int, Media> $uploaded_medias */
-        $session_uploaded_media = collect([]);
+        // /** @var Collection<int, Media> $uploaded_medias */
+        // $session_uploaded_media = collect([]);
+
+        /** @var Collection<int, TemporaryUploadedImages> $uploaded_medias */
+        $temporary_uploaded_images = collect([]);
+
+        /** @var User $var description */
+        $logged_user = Auth::User()->loadCount('temporaryUploadedImages');
 
         /** @var Collection<int, Media> $uploaded_medias */
         $uploaded_medias_data = $files->map(
-            function ($file) use ($session_uploaded_media) {
+            function ($file) use ($temporary_uploaded_images, $logged_user) {
 
                 Log::info(
-                    'accessing FileController with files {files}',
+                    'accessing FileController storeMany, with files {files}',
                     ['files' => $file]
                 );
 
                 $file_path = $file->getRealPath();
 
-                //https://cloudinary.com/documentation/image_upload_api_reference
-                //https://cloudinary.com/documentation/transformation_reference
-                //https://cloudinary.com/documentation/image_optimization
-                //https://cloudinary.com/documentation/eager_and_incoming_transformations#eager_transformations
-                ///eager which apply multiple transformations on the fly during upload
+                Log::info('file path {file_path}', ['file_path' => $file_path]);
+
+                // https://cloudinary.com/documentation/image_upload_api_reference
+                // https://cloudinary.com/documentation/transformation_reference
+                // https://cloudinary.com/documentation/image_optimization
+                // https://cloudinary.com/documentation/eager_and_incoming_transformations#eager_transformations
+                // /eager which apply multiple transformations on the fly during upload
                 // and return multiple transformed images, as opposed the transformation
-                //which works only on the main image and return it
+                // which works only on the main image and return it
                 // alternative to eager is eager_async,
-                //which apply transformation after upload request is done
+                // which apply transformation after upload request is done
                 // when first visited by user i.e end-user using front end
-                //https://cloudinary.com/documentation/transformation_reference
+                // https://cloudinary.com/documentation/transformation_reference
                 // if width => value used with quality => auto will be the same as width => value alone
                 // 'effect' => ['bgremoval|make_transparent'] to remove background  is bad and doesn't work
-                //return base image plus two images one with transformation of width 90 and auto height
+                // return base image plus two images one with transformation of width 90 and auto height
                 // and second is width 700 and height is 700 plus cropping
                 $response = Cloudinary::upload($file_path, [
-                    'eager' => [ //list of transformation objects -> https://cloudinary.com/documentation/transformation_reference
+                    'eager' => [ // list of transformation objects -> https://cloudinary.com/documentation/transformation_reference
                         [
                             'width' => 500,
                             // 'height' => 500,
@@ -194,7 +205,7 @@ class FileController extends Controller
                 // get request response object
                 // return $result->getResponse();
                 // the url of the uploaded image -> real image on usage
-                //example result: https:cloudinary$pathToImage
+                // example result: https:cloudinary$pathToImage
                 // $cloudinary_image_path = $response->getSecurePath();
 
                 // unique identifer for the image
@@ -202,9 +213,21 @@ class FileController extends Controller
                 // example result: jasldkjGAsdfkj
                 // $cloudinary_public_id = $response->getPublicId();
 
-                $uploaded_media = Media::fromCloudinaryUploadResponse($response);
+                // $uploaded_media = Media::fromCloudinaryUploadResponse($response);
 
-                $session_uploaded_media->push($uploaded_media);
+                $uploaded_media = TemporaryUploadedImages::fromCloudinaryUploadResponse($response, $logged_user->id);
+
+                $temporary_uploaded_images->push($uploaded_media);
+
+                // $media = new Media;
+                // $media->file_name = $response_file->getFileName();
+                // // $media->file_url = $response_file->getSecurePath();
+                // // $media->file_url = $response_file->getSecurePath();
+                // $media->file_url = $first_eager_response['secure_url'];
+                // // $media->size = $first_eager_response->getSize();
+                // $media->size = $first_eager_response['bytes'];
+                // $media->file_type = $response_file->getFileType();
+                //         $session_uploaded_media->push($uploaded_media);
 
                 return new UploadFileResponseData(
                     url: $uploaded_media->file_url,
@@ -213,28 +236,34 @@ class FileController extends Controller
             }
         );
 
-        $upload_cars_images_session_key = config('constants.session.upload_car_images');
+        $user_has_previous_temporary_uploaded_images =
+            $logged_user->temporary_uploaded_images_count != 0;
 
-        $request
-            ->session()
-            ->put(
-                $upload_cars_images_session_key,
-                $session_uploaded_media
-            );
+        if ($user_has_previous_temporary_uploaded_images) {
 
-        \Storage::disk('app')
-            ->put(
-                'Test.php',
-                $request
-                    ->session()
-                    ->get($upload_cars_images_session_key)
-            );
+            $logged_user
+                ->temporaryUploadedImages()
+                ->delete();
+        }
+
+        $logged_user
+            ->temporaryUploadedImages()
+            ->saveMany($temporary_uploaded_images);
+
+        // $upload_cars_images_session_key = config('constants.session.upload_car_images');
+
+        // $request
+        //     ->session()
+        //     ->put(
+        //         $upload_cars_images_session_key,
+        //         $session_uploaded_media
+        //     );
 
         return $uploaded_medias_data;
 
     }
 
-    //eager upload with 2 transformation response
+    // eager upload with 2 transformation response
     // {
     //     "asset_id": "e993e6a01e81b12c360e4ce2757cd9b9",
     //     "public_id": "sg8oi7r0xr3cknbddbe7",
@@ -280,22 +309,41 @@ class FileController extends Controller
 
     #[OAT\Delete(path: '/files/{public_id}', tags: ['files'])]
     #[SuccessNoContentResponse]
-    public function delete(FilePublicIdPathParameterData $deleteFileData)
+    public function delete(FilePublicIdPathParameterData $deleteFileData, Request $request)
     {
-        \Storage::disk('app')
-            ->put(
-                'Test.php',
+
+        Log::info('file public id  {data}', ['data' => $deleteFileData->public_id]);
+
+        TemporaryUploadedImages::query()
+            ->firstWhere(
+                'public_id',
                 $deleteFileData->public_id
-            );
+            )
+            ->delete();
+
+        // $uploaded_car_images_session_key = config('constants.session.upload_car_images');
+        // /** @var Collection<int, Media> $user_car_medias */
+        // $user_car_medias =
+        //    $request
+        //        ->session()
+        //        ->get($uploaded_car_images_session_key);
+
+        // if ($user_car_medias) {
+
+        //     Log::info('session data {session_data}', ['session_data' => $user_car_medias]);
+
+        // $updated_user_car_medias =
+        //     $user_car_medias
+        //         ->filter(function ($item) use ($deleteFileData) {
+        //             return $item->file_name != $deleteFileData->public_id;
+        //         });
+
+        // $request->session()->forget($uploaded_car_images_session_key);
+
+        // }
 
         Cloudinary::destroy($deleteFileData->public_id);
 
-        \Storage::disk('app')
-            ->put(
-                'Test2.php',
-                $deleteFileData->public_id
-            );
-
-        return 1;
+        return true;
     }
 }

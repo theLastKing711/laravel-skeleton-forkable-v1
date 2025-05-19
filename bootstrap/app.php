@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\Locale;
+use App\Http\Middleware\OptionalAuthSanctum;
 use App\Http\Middleware\ParseStringToBoolInQueryParameter;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -17,8 +18,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: ['*']);
         $middleware->statefulApi();
         $middleware->append(Locale::class);
-        //'true' or 'false' to true or false in query params for laravel-data and l5-swagger integration
+        // 'true' or 'false' to true or false in query params for laravel-data and l5-swagger integration
         $middleware->append(ParseStringToBoolInQueryParameter::class);
+
+        $middleware->alias([
+            'optional_auth' => OptionalAuthSanctum::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
