@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Storage;
 
 class CreateDataFile extends Command
 {
@@ -99,7 +100,7 @@ class CreateDataFile extends Command
 
             EOT;
 
-            $written = \Storage::disk('app')
+            $written = Storage::disk('app')
                 ->put('Data'.'\\'.$this->argument('name').'PathParameterData.php', $fileContents);
 
             if ($written) {
@@ -186,7 +187,7 @@ class CreateDataFile extends Command
 
             EOT;
 
-            $written = \Storage::disk('app')
+            $written = Storage::disk('app')
                 ->put('Data'.'\\'.$this->argument('name').'PaginationResultData.php', $fileContents);
 
             $file_class_name =
@@ -213,7 +214,7 @@ class CreateDataFile extends Command
 
             EOT;
 
-            $written = \Storage::disk('app')
+            $written = Storage::disk('app')
                 ->put('Data'.'\\'.$real_path.'\\'.$file_class_name.'Data.php', $fileContents);
 
             if ($written) {
@@ -259,7 +260,7 @@ class CreateDataFile extends Command
 
             EOT;
 
-            $written = \Storage::disk('app')
+            $written = Storage::disk('app')
                 ->put('Data'.'\\'.$this->argument('name').'Data.php', $fileContents);
 
             if ($written) {
@@ -293,7 +294,7 @@ class CreateDataFile extends Command
 
         EOT;
 
-        $written = \Storage::disk('app')
+        $written = Storage::disk('app')
             ->put('Data'.'\\'.$this->argument('name').'Data.php', $fileContents);
 
         if ($written) {

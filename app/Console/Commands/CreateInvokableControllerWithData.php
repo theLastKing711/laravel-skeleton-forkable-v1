@@ -2,8 +2,9 @@
 
 namespace App\Console\Commands;
 
-use Artisan;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Storage;
 
 class CreateInvokableControllerWithData extends Command
 {
@@ -222,7 +223,7 @@ class CreateInvokableControllerWithData extends Command
 
             EOT;
 
-            $written = \Storage::disk('app')
+            $written = Storage::disk('app')
                 ->put('Http\Controllers'.'\\'.$this->argument('name').'Controller.php', $fileContents);
 
             Artisan::call('make:data', [
@@ -242,7 +243,7 @@ class CreateInvokableControllerWithData extends Command
                 $fileContents = <<<EOT
                 <?php
 
-                namespace App\Http\Controller\\$real_path;
+                namespace App\Http\Controllers\\$real_path;
 
                 use App\Http\Controllers\Controller;
                 use App\Data\Shared\Swagger\Response\SuccessNoContentResponse;
@@ -271,7 +272,7 @@ class CreateInvokableControllerWithData extends Command
 
                 EOT;
 
-                $written = \Storage::disk('app')
+                $written = Storage::disk('app')
                     ->put('Http\Controllers'.'\\'.$this->argument('name').'Controller.php', $fileContents);
 
                 return;
@@ -301,7 +302,7 @@ class CreateInvokableControllerWithData extends Command
             $fileContents = <<<EOT
             <?php
 
-            namespace App\Http\Controller\\$real_path;
+            namespace App\Http\Controllers\\$real_path;
 
 
             use App\Http\Controllers\Controller;
@@ -335,11 +336,11 @@ class CreateInvokableControllerWithData extends Command
 
             EOT;
 
-            $written = \Storage::disk('app')
+            $written = Storage::disk('app')
                 ->put('Http\Controllers'.'\\'.$this->argument('name').'Controller.php', $fileContents);
 
             Artisan::call('make:data', [
-                'name' => $post_option,
+                'name' => $patch_option,
             ]);
 
             return;
@@ -405,7 +406,7 @@ class CreateInvokableControllerWithData extends Command
 
             EOT;
 
-            $written = \Storage::disk('app')
+            $written = Storage::disk('app')
                 ->put('Http\Controllers'.'\\'.$this->argument('name').'Controller.php', $fileContents);
 
             Artisan::call('make:data', [
@@ -487,7 +488,7 @@ class CreateInvokableControllerWithData extends Command
 
                 EOT;
 
-                $written = \Storage::disk('app')
+                $written = Storage::disk('app')
                     ->put('Http\Controllers'.'\\'.$this->argument('name').'Controller.php', $fileContents);
 
                 Artisan::call('make:data', [
@@ -528,7 +529,7 @@ class CreateInvokableControllerWithData extends Command
 
             EOT;
 
-            $written = \Storage::disk('app')
+            $written = Storage::disk('app')
                 ->put('Http\Controllers'.'\\'.$this->argument('name').'Controller.php', $fileContents);
 
             Artisan::call('make:data', [
@@ -575,7 +576,7 @@ class CreateInvokableControllerWithData extends Command
 
             EOT;
 
-            $written = \Storage::disk('app')
+            $written = Storage::disk('app')
                 ->put('Http\Controllers'.'\\'.$this->argument('name').'Controller.php', $fileContents);
 
             return;
@@ -632,7 +633,7 @@ class CreateInvokableControllerWithData extends Command
 
             EOT;
 
-            $written = \Storage::disk('app')
+            $written = Storage::disk('app')
                 ->put('Http\Controllers'.'\\'.$this->argument('name').'Controller.php', $fileContents);
 
             Artisan::call('make:data', [
@@ -694,7 +695,7 @@ class CreateInvokableControllerWithData extends Command
 
             EOT;
 
-            $written = \Storage::disk('app')
+            $written = Storage::disk('app')
                 ->put('Http\Controllers'.'\\'.$this->argument('name').'Controller.php', $fileContents);
 
             Artisan::call('make:data', [
@@ -766,7 +767,7 @@ class CreateInvokableControllerWithData extends Command
 
             EOT;
 
-            $written = \Storage::disk('app')
+            $written = Storage::disk('app')
                 ->put('Http\Controllers'.'\\'.$this->argument('name').'Controller.php', $fileContents);
 
             Artisan::call('make:data', [
@@ -806,7 +807,7 @@ class CreateInvokableControllerWithData extends Command
 
             EOT;
 
-        $written = \Storage::disk('app')
+        $written = Storage::disk('app')
             ->put('Http\Controllers'.'\\'.$this->argument('name').'Controller.php', $fileContents);
 
     }
