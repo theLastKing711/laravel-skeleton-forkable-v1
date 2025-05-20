@@ -1,16 +1,12 @@
 <?php
 
-namespace App\Data\Testing\Sex;
+namespace App\Data\Testing;
 
 use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
-use OpenApi\Attributes as OAT;
 
 #[TypeScript]
-class Testing extends Data
+class SexData extends Data
 {
-    public function __construct()
-    {
-
-    }
+    public function __construct() {}
 }
