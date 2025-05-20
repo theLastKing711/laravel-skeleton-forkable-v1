@@ -12,6 +12,13 @@
                 }
             ]
         },
+        "/files/{id}": {
+            "parameters": [
+                {
+                    "$ref": "#/components/parameters/filesPublicIdPathParameterData"
+                }
+            ]
+        },
         "/admin/users": {
             "get": {
                 "tags": [
@@ -388,6 +395,87 @@
                     }
                 }
             }
+        },
+        "/files/many": {
+            "post": {
+                "tags": [
+                    "files"
+                ],
+                "operationId": "68ff5a9628dc11dee6bb9ad96dc0ab0b",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UploadFileListData"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Files uploaded successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/UploadFileListData"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/files/{public_id}": {
+            "delete": {
+                "tags": [
+                    "files"
+                ],
+                "operationId": "b52d1e9d72aaaf50eb426fd91728e567",
+                "responses": {
+                    "204": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/auth/register": {
+            "post": {
+                "tags": [
+                    "usersAuth"
+                ],
+                "operationId": "aa7e2d048b2a67158ee3c7251acbff2e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RegisterRequestData"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Item fetched successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RegisterResponseData"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -466,6 +554,14 @@
                 },
                 "type": "object"
             },
+            "DeleteFileData": {
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
             "FilePathData": {
                 "properties": {
                     "url": {
@@ -474,6 +570,7 @@
                 },
                 "type": "object"
             },
+            "FilePublicIdPathParameterData": {},
             "ShowFileData": {
                 "properties": {
                     "uid": {
@@ -506,6 +603,28 @@
                 },
                 "type": "object"
             },
+            "UploadFileListData": {
+                "properties": {
+                    "files": {
+                        "type": "array",
+                        "items": {
+                            "type": "Illuminate\\Http\\UploadedFile"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "UploadFileListResponseData": {
+                "properties": {
+                    "files": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/UploadFileResponseData"
+                        }
+                    }
+                },
+                "type": "object"
+            },
             "UploadFileResponseData": {
                 "properties": {
                     "url": {
@@ -531,6 +650,17 @@
             "LoginFailedResponse": {
                 "properties": {
                     "message": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "MediaData": {
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "file_url": {
                         "type": "string"
                     }
                 },
@@ -573,6 +703,23 @@
                 },
                 "type": "object"
             },
+            "LoginRequestData": {},
+            "RegisterRequestData": {
+                "properties": {
+                    "phone_number": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "RegisterResponseData": {
+                "properties": {
+                    "token": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
             "Gender": {
                 "description": "[0 => Male, 1 => Female]",
                 "type": "integer",
@@ -589,6 +736,14 @@
                 "required": true,
                 "schema": {
                     "type": "integer"
+                }
+            },
+            "filesPublicIdPathParameterData": {
+                "name": "public_id",
+                "in": "path",
+                "required": true,
+                "schema": {
+                    "type": "string"
                 }
             },
             "localeQueryParameter": {
@@ -632,6 +787,10 @@
         {
             "name": "files",
             "description": "files"
+        },
+        {
+            "name": "usersAuth",
+            "description": "usersAuth"
         }
     ]
 }
