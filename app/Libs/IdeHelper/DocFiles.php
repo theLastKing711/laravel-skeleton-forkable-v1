@@ -1,21 +1,21 @@
 <?php
 
-namespace App\Libs\IdeHelper\ModelHooks;
+namespace App\Libs\IdeHelper;
 
 use Illuminate\Database\Eloquent\Builder;
 
-class DocFiles {
-
+class DocFiles
+{
     /**
      * undocumented function summary
      *
      * Undocumented function long description
      *
-     * @param string $relation
+     * @param  string  $relation
      * @return Builder
      **/
     public function joinRelationship($relation)
     {
-        # code...
+        // code...
     }
 }
