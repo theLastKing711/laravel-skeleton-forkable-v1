@@ -622,7 +622,7 @@ class CreateInvokableControllerWithData extends Command
             class $file_class_name extends Controller
             {
 
-                #[OAT\Delete(path: ''/$main_route', tags: ['$tag'])]
+                #[OAT\Delete(path: '/$main_route', tags: ['$tag'])]
                 #[ListQueryParameter]
                 #[SuccessNoContentResponse]
                 public function __invoke($delete_many_data_name)
@@ -684,7 +684,7 @@ class CreateInvokableControllerWithData extends Command
             class $file_class_name extends Controller
             {
 
-                #[OAT\Post(path: ''/$main_route', tags: ['$tag'])]
+                #[OAT\Post(path: '/$main_route', tags: ['$tag'])]
                 #[JsonRequestBody($post_form_data_name)]
                 #[SuccessNoContentResponse]
                 public function __invoke($post_form_data_class \$request)
