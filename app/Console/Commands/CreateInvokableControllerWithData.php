@@ -118,7 +118,8 @@ class CreateInvokableControllerWithData extends Command
 
             $path_class_import = 'use App\Data\\'.$path_final_name;
 
-            $path_variable_declaration = $path_data_name.' $pathId,';
+            $path_variable_declaration = $path_data_name.' $pathParemeterData,';
+
 
             $path_ref =
             strtolower(
