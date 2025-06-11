@@ -13,13 +13,13 @@ Route::prefix('files')
         Route::post('', [FileController::class, 'store']);
     });
 
-Route::prefix('admin')
+Route::prefix('admins')
     ->middleware(['api'])
     ->group(function () {
         $adminRole = RolesEnum::ADMIN->value;
 
         Route::middleware(['auth:sanctum', "role:{$adminRole}"])
-            //auth:sanctum check if user is logged in (middleware('auth')),
+            // auth:sanctum check if user is logged in (middleware('auth')),
             ->group(function () {
 
                 Route::prefix('tests')
@@ -30,7 +30,6 @@ Route::prefix('admin')
                         Route::get('queryParameters', [ExampleController::class, 'get_query_parameters']);
 
                         Route::post('post_json', [ExampleController::class, 'post_json']);
-
 
                         Route::patch('{id}', [ExampleController::class, 'patch_json']);
                         Route::delete('{id}', [ExampleController::class, 'delete_json']);

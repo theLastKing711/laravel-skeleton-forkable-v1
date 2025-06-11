@@ -21,9 +21,9 @@ class AuthController extends Controller
             path: '/sanctum/csrf-cookie',
             tags: ['sanctum'],
             //        parameters: [
-            ////            new OAT\HeaderParameter(
-            ////                name: 'X-CSRF-TOKEN',
-            ////            ),
+            // //            new OAT\HeaderParameter(
+            // //                name: 'X-CSRF-TOKEN',
+            // //            ),
             //            new OAT\HeaderParameter(
             //                name: 'Origin',
             //                schema: new OAT\Schema(
@@ -66,7 +66,7 @@ class AuthController extends Controller
 
     #[OAT\Tag('auth')]
     #[OAT\Post(
-        path: '/admin/auth/login',
+        path: '/admins/auth/login',
         tags: ['auth'],
         responses: [
             new OAT\Response(
@@ -99,7 +99,7 @@ class AuthController extends Controller
     }
 
     #[OAT\Post(
-        path: '/admin/auth/logout',
+        path: '/admins/auth/logout',
         tags: ['auth'],
         responses: [
             new OAT\Response(
