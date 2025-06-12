@@ -15,6 +15,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // allows you to access routes without hitting /sanctum and sending request without csrf token
+        // can be removed once we setup sanctum
         $middleware->validateCsrfTokens(except: ['*']);
         $middleware->statefulApi();
         $middleware->append(Locale::class);
