@@ -52,7 +52,7 @@ enum RolesEnum: string
 
     public static function oneRoleOnlyMiddleware(RolesEnum $role): string
     {
-        return 'role: '.$role->value;
+        return 'role:'.$role->value;
 
     }
 }
