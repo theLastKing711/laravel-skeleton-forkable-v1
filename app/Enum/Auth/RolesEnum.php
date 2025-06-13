@@ -26,4 +26,27 @@ enum RolesEnum: string
             self::STORE => 'Store',
         };
     }
+
+    /**
+     * Summary of oneOfMiddleware
+     *
+     * @param  RolesEnum[]  $roles
+     */
+    public static function oneOfMiddleware(...$roles): string
+    {
+        $roles_count = count($roles);
+
+        $roles_collections = collect($roles);
+
+        return $roles_collections->reduce(function ($prev, $current, $index) {
+
+            if ($index === 0) {
+                return $prev.$current->value;
+            }
+
+            return $prev.'|'.$current->value;
+
+        }, 'role:');
+
+    }
 }
