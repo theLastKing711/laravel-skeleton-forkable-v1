@@ -18,6 +18,7 @@ Route::prefix('admins')
     ->group(function () {
         $adminRole = RolesEnum::ADMIN->value;
 
+        // must be logged in after making request to /sanctum and obtaining token to send here
         Route::middleware(['auth:sanctum', "role:{$adminRole}"])
             // auth:sanctum check if user is logged in (middleware('auth')),
             ->group(function () {
@@ -38,6 +39,7 @@ Route::prefix('admins')
 
             });
 
+        // NEEDS CSRF TOKEN, EVEN THOUGH IT'S OUTSIDE auth:sanctum middleware
         Route::prefix('auth')->group(function () {
             Route::post('login', [AuthController::class, 'login']);
             Route::post('logout', [AuthController::class, 'logout']);
