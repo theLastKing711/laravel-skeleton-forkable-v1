@@ -34,8 +34,6 @@ enum RolesEnum: string
      */
     public static function oneOfRolesMiddleware(...$roles): string
     {
-        $roles_count = count($roles);
-
         $roles_collections = collect($roles);
 
         return $roles_collections->reduce(function ($prev, $current, $index) {

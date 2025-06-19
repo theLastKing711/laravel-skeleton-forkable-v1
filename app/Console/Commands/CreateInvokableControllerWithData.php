@@ -13,7 +13,7 @@ class CreateInvokableControllerWithData extends Command
      *
      * @var string
      */
-    protected $signature = 'make:data-controller {name} {--path==} {--query==} {--post==} {--post-form==} {--patch==} {--patch-form==} {--get-one==} {--get-many==} {--delete-one} {--delete-many==} {--pagination==} ';
+    protected $signature = 'make:data-controller {name} {--path==} {--query==} {--post==} {--post-form==} {--patch==} {--patch-form==} {--get-one==} {--get-many==} {--delete-one==} {--delete-many==} {--pagination==} ';
 
     /**
      * The console command description.
@@ -119,7 +119,6 @@ class CreateInvokableControllerWithData extends Command
             $path_class_import = 'use App\Data\\'.$path_final_name;
 
             $path_variable_declaration = $path_data_name.' $pathParemeterData,';
-
 
             $path_ref =
             strtolower(
@@ -544,13 +543,34 @@ class CreateInvokableControllerWithData extends Command
 
         if ($delete_one_option) {
 
+            $delete_path =
+                str_replace(
+                    '/',
+                    '\\',
+                    $delete_one_option
+                );
+
+            $delete_option_array =
+            explode(
+                '\\',
+                $delete_path,
+            );
+
+            $delete_data_class =
+                $delete_option_array[count($delete_option_array) - 1].'Data';
+
+            $delete_data_name =
+                $delete_data_class.'::class';
+
+            $delete_final_name = $delete_path.'Data';
+
             $fileContents = <<<EOT
             <?php
 
             namespace App\Http\Controllers\\$real_path;
 
             use App\Http\Controllers\Controller;
-            $path_class_import;
+            use App\Data\\$delete_final_name;
             use App\Data\Shared\Swagger\Response\SuccessNoContentResponse;
             use OpenApi\Attributes as OAT;
 
@@ -569,7 +589,7 @@ class CreateInvokableControllerWithData extends Command
 
                 #[OAT\Delete(path: '/$main_route/{id}', tags: ['$tag'])]
                 #[SuccessNoContentResponse]
-                public function __invoke($path_variable_declaration)
+                public function __invoke($delete_data_class \$request)
                 {
 
                 }
@@ -579,6 +599,10 @@ class CreateInvokableControllerWithData extends Command
 
             $written = Storage::disk('app')
                 ->put('Http\Controllers'.'\\'.$this->argument('name').'Controller.php', $fileContents);
+
+            Artisan::call('make:data', [
+                'name' => $delete_one_option,
+            ]);
 
             return;
         }
