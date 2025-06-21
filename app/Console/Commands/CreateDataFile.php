@@ -12,7 +12,7 @@ class CreateDataFile extends Command
      *
      * @var string
      */
-    protected $signature = 'make:data {name} {--path} {--delete-many} {--pagination}';
+    protected $signature = 'make:data {name} {--path} {--delete-many} {--pagination==}';
 
     /**
      * The console command description.
@@ -26,8 +26,6 @@ class CreateDataFile extends Command
      */
     public function handle()
     {
-
-        $this->info('hello world');
 
         /** @var string $path */
         $path =
@@ -120,89 +118,93 @@ class CreateDataFile extends Command
 
         $pagination_option = $this->option('pagination');
 
-        $this->info('hello world');
-
         if ($pagination_option) {
 
             // /** @var string $path */
-            // $pagination_path =
-            // str_replace(
-            //     '/',
-            //     '\\',
-            //     $this->argument('pagination')
-            // );
-
-            // $pagination_class_name =
-            //     explode(
+            // $response_path =
+            //     str_replace(
+            //         '/',
             //         '\\',
-            //         $pagination_path
+            //         $this->option('pagination')
             //     );
 
-            // $pagination_augmented_path =
+            // $response_class_name =
             //     explode(
             //         '\\',
-            //         $pagination_path
-            //     ).'Data';
+            //         $response_path
+            //     );
 
-            // $pagination_file_class_name =
-            //     $pagination_class_name[count($class_name) - 1].'Data';
+            // $response_augmented_path =
+            //     explode(
+            //         '\\',
+            //         $response_path
+            //     );
 
-            // $file_class_name =
-            //     $file_class_name_without_data.'PaginationResultData';
+            // array_splice($response_augmented_path, -1, 1);
 
-            // $pagination_data_class = $pagination_option
+            // $response_path = implode('\\', $response_augmented_path);
 
-            $file_class_name =
-                $file_class_name_without_data.'PaginationResultData';
+            // $response_file_class_name =
+            //     $file_class_name_without_data.'Data';
 
-            $child_class_name = $file_class_name_without_data.'Data';
+            // $fileContents_3 = <<<EOT
+            // <?php
 
-            $fileContents = <<<EOT
+            // namespace App\Data\\$response_path;
+            // use Spatie\LaravelData\Data;
+            // use Spatie\TypeScriptTransformer\Attributes\TypeScript;
+            // use OpenApi\Attributes as OAT;
+
+            // #[TypeScript]
+            // #[Oat\Schema()]
+            // class $response_file_class_name extends Data
+            // {
+            //     public function __construct(
+
+            //     ) {
+            //     }
+            // }
+
+            // EOT;
+
+            /** @var string $path */
+            $pagination_path =
+                str_replace(
+                    '/',
+                    '\\',
+                    $this->option('pagination')
+                );
+
+            $pagination_class_name =
+                explode(
+                    '\\',
+                    $pagination_path
+                );
+
+            $pagination_augmented_path =
+                explode(
+                    '\\',
+                    $pagination_path
+                );
+
+            array_splice($pagination_augmented_path, -1, 1);
+
+            $pagination_path = implode('\\', $pagination_augmented_path);
+
+            $pagination_path_file_name_without_data =
+                $pagination_class_name[count($pagination_class_name) - 1];
+
+            $pagination_file_class_name =
+                $pagination_path_file_name_without_data.'Data';
+
+            $fileContents_2 = <<<EOT
             <?php
 
-            namespace App\Data\\$real_path;
-
-            use App\Data\\$real_path\\$child_class_name;
-            use App\Data\Shared\Pagination\PaginationResultData;
-            use App\Data\Shared\Swagger\Property\ArrayProperty;
-            use Illuminate\Support\Collection;
-            use OpenApi\Attributes as OAT;
-
-            #[TypeScript]
-            #[Oat\Schema()]
-            class $file_class_name  extends PaginationResultData
-            {
-                /** @param Collection<int, $child_class_name> \$data */
-                public function __construct(
-                    int \$current_page,
-                    int \$per_page,
-                    #[ArrayProperty($child_class_name::class)]
-                    public Collection \$data,
-                    int \$total
-                ) {
-                    parent::__construct(\$current_page, \$per_page, \$total);
-                }
-            }
-
-
-            EOT;
-
-            $written = Storage::disk('app')
-                ->put('Data'.'\\'.$this->argument('name').'PaginationResultData.php', $fileContents);
-
-            $file_class_name =
-                $file_class_name_without_data.'QueryParameterData';
-
-            $real_path = $real_path.'\\'.'QueryParameters';
-
-            $fileContents = <<<EOT
-            <?php
-
-            namespace App\Data\\$real_path;
+            namespace App\Data\\$pagination_path;
 
             use App\Data\Shared\Pagination\QueryParameters\PaginationQueryParameterData;
 
-            class $file_class_name extends PaginationQueryParameterData
+            class $pagination_file_class_name extends PaginationQueryParameterData
             {
                 public function __construct(
                     ?int \$page,
@@ -215,13 +217,118 @@ class CreateDataFile extends Command
             EOT;
 
             $written = Storage::disk('app')
-                ->put('Data'.'\\'.$real_path.'\\'.$file_class_name.'Data.php', $fileContents);
+                ->put('Data'.'\\'.$pagination_path.'\\'.$pagination_file_class_name.'.php', $fileContents_2);
 
             if ($written) {
                 $this->info('Created new Repo '.$this->argument('name').'Repository.php in App\Repositories.');
             } else {
                 $this->info('Something went wrong');
             }
+
+            // /** @var string $path */
+            // $response_path =
+            //     str_replace(
+            //         '/',
+            //         '\\',
+            //         $this->option('pagination')
+            //     );
+
+            // $response_class_name =
+            //     explode(
+            //         '\\',
+            //         $response_path
+            //     );
+
+            // $response_augmented_path =
+            //     explode(
+            //         '\\',
+            //         $response_path
+            //     );
+
+            // array_splice($response_augmented_path, -1, 1);
+
+            // $response_path = implode('\\', $response_augmented_path);
+
+            // $response_file_class_name =
+            //     $file_class_name_without_data.'Data';
+
+            $response_item_file_class_name =
+               $file_class_name_without_data.'Data';
+
+            $fileContents_3 = <<<EOT
+            <?php
+
+            namespace App\Data\\$real_path;
+
+            use Spatie\LaravelData\Data;
+            use Spatie\TypeScriptTransformer\Attributes\TypeScript;
+            use OpenApi\Attributes as OAT;
+
+            #[TypeScript]
+            #[Oat\Schema()]
+            class $response_item_file_class_name extends Data
+            {
+                public function __construct(
+
+                ) {
+                }
+            }
+
+            EOT;
+
+            $written = Storage::disk('app')
+                // ->put('Data'.'\\'.$pagination_path.'\\'.$response_item_file_class_name.'.php', $fileContents_3);
+                ->put('Data'.'\\'.$this->argument('name').'Data.php', $fileContents_3);
+
+            if ($written) {
+                $this->info('Created new Repo '.$this->argument('name').'Repository.php in App\Repositories.');
+            } else {
+                $this->info('Something went wrong');
+            }
+
+            $file_class_name =
+                $file_class_name_without_data.'PaginationResultData';
+
+            $child_class_name = $file_class_name_without_data.'Data';
+
+            $fileContents = <<<EOT
+            <?php
+
+            namespace App\Data\\$real_path;
+
+            use App\Data\Shared\Pagination\PaginationResultData;
+            use App\Data\Shared\Swagger\Property\ArrayProperty;
+            use Illuminate\Support\Collection;
+            use OpenApi\Attributes as OAT;
+            use Spatie\TypeScriptTransformer\Attributes\TypeScript;
+
+
+            #[TypeScript]
+            #[Oat\Schema()]
+            class $file_class_name  extends PaginationResultData
+            {
+                /** @param Collection<int, $child_class_name> \$data */
+                public function __construct(
+                    int \$current_page,
+                    int \$per_page,
+                    #[ArrayProperty($child_class_name::class)]
+                    public Collection \$data,
+                    int \$total,
+                ) {
+                    parent::__construct(\$current_page, \$per_page, \$total);
+                }
+            }
+
+
+            EOT;
+
+            $written = Storage::disk('app')
+                ->put('Data'.'\\'.$this->argument('name').'PaginationResultData.php', $fileContents);
+
+            // $file_class_name =
+            //     $file_class_name_without_data.'QueryParameterData';
+
+            // $real_path = $real_path.'\\'.'QueryParameters';
 
             return;
         }
@@ -241,6 +348,7 @@ class CreateDataFile extends Command
             <?php
 
             namespace App\Data\\$real_path;
+
             $array_property_import;
             $collection_import;
             use Spatie\LaravelData\Data;

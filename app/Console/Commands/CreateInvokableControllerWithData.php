@@ -421,6 +421,10 @@ class CreateInvokableControllerWithData extends Command
 
         if ($get_many_option) {
 
+            $this->info($this->option('pagination'));
+
+            $pagination_option = $this->hasOption('pagination');
+
             $get_many_path =
             str_replace(
                 '/',
@@ -447,26 +451,54 @@ class CreateInvokableControllerWithData extends Command
 
             $this->info($this->option('pagination'));
 
-            if ($this->option('pagination')) {
+            if ($pagination_option) {
 
-                $get_many_data_name = $get_many_data_class.
+                // $get_many_data_name = $get_many_data_class.
 
-                $this->info('hello worlds');
                 $query_option = $this->argument('name');
 
-                $query_parameter_file_name = $input_file_name.'QueryParameterData';
+                $query_parameter_path =
+                        str_replace(
+                            '/',
+                            '\\',
+                            $this->option('pagination')
+                        );
+
+                $query_class_name =
+                    explode(
+                        '\\',
+                        $query_parameter_path
+                    );
+
+                $query_augmented_path =
+                explode(
+                    '\\',
+                    $query_parameter_path
+                );
+
+                array_splice($query_augmented_path, -1, 1);
+
+                $query_path = implode('\\', $query_augmented_path);
+
+                $query_path_file_name_without_data =
+                    $query_class_name[count($query_class_name) - 1];
+
+                $query_file_class_name =
+                    $query_path_file_name_without_data.'Data';
 
                 $pagination_class =
                     $get_many_data_class_without_data.'PaginationResultData';
 
                 $pagination_path = $get_many_path.'PaginationResultData';
 
+                $query_parameter_path_with_Data = $query_parameter_path.'Data';
+
                 $fileContents = <<<EOT
                 <?php
 
                 namespace App\Http\Controllers\\$real_path;
 
-                use App\Data\\$real_path\\QueryParameters\\$query_parameter_file_name;
+                use App\Data\\$query_parameter_path_with_Data;
                 use App\Http\Controllers\Controller;
                 use App\Data\Shared\Swagger\Parameter\QueryParameter\QueryParameter;
                 use App\Data\\$pagination_path;
@@ -480,7 +512,7 @@ class CreateInvokableControllerWithData extends Command
                     #[QueryParameter('page', 'integer')]
                     #[QueryParameter('perPage', 'integer')]
                     #[SuccessItemResponse($pagination_class::class)]
-                    public function __invoke($query_parameter_file_name \$request)
+                    public function __invoke($query_file_class_name \$request)
                     {
 
                     }
@@ -491,13 +523,16 @@ class CreateInvokableControllerWithData extends Command
                 $written = Storage::disk('app')
                     ->put('Http\Controllers'.'\\'.$this->argument('name').'Controller.php', $fileContents);
 
-                Artisan::call('make:data', [
-                    'name' => $get_many_option,
-                    '--pagination' => 'default',
-                ]);
+                $this->info($this->option('pagination'));
+
+                // Artisan::call('make:data', [
+                //     'name' => $get_many_option,
+                // ]);
 
                 Artisan::call('make:data', [
+                    // 'name' => $this->option('pagination'),
                     'name' => $get_many_option,
+                    '--pagination' => $this->option('pagination'),
                 ]);
 
                 return;
