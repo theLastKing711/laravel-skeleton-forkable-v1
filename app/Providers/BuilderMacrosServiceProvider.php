@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 
@@ -101,6 +102,23 @@ class BuilderMacrosServiceProvider extends ServiceProvider
             /** @var Collection $this */
 
             return $this->pluck($relation)->flatten();
+        });
+
+        Collection::macro('paginate', macro: function (int $perPage, $total = null, $page = null, $pageName = 'page') {
+            $page = $page ?: LengthAwarePaginator::resolveCurrentPage($pageName);
+
+            /** @var Builder $this description */
+
+            return new LengthAwarePaginator(
+                $total ? $this : $this->forPage($page, $perPage)->values(),
+                $total ?: $this->count(),
+                $perPage,
+                $page,
+                [
+                    'path' => LengthAwarePaginator::resolveCurrentPath(),
+                    'pageName' => $pageName,
+                ]
+            );
         });
 
         // Collection::macro(
