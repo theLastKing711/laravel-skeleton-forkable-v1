@@ -49,7 +49,10 @@ class CreateDataFile extends Command
 
         array_splice($augmented_path, -1, 1);
 
-        $real_path = implode('\\', $augmented_path);
+        $real_path = implode('\\', array: $augmented_path);
+
+        $schemaName =
+               str_replace('\\', '', $real_path);
 
         if ($this->option('path')) {
 
@@ -265,7 +268,7 @@ class CreateDataFile extends Command
             use OpenApi\Attributes as OAT;
 
             #[TypeScript]
-            #[Oat\Schema()]
+            #[Oat\Schema(name: '$schemaName')]
             class $response_item_file_class_name extends Data
             {
                 public function __construct(
@@ -304,7 +307,7 @@ class CreateDataFile extends Command
 
 
             #[TypeScript]
-            #[Oat\Schema()]
+            #[Oat\Schema(name: '$schemaName')]
             class $file_class_name  extends PaginationResultData
             {
                 /** @param Collection<int, $child_class_name> \$data */
@@ -357,7 +360,7 @@ class CreateDataFile extends Command
 
 
             #[TypeScript]
-            #[Oat\Schema()]
+            #[Oat\Schema(name: '$schemaName')]
             class $file_class_name extends Data
             {
                 public function __construct(
@@ -391,7 +394,7 @@ class CreateDataFile extends Command
         use OpenApi\Attributes as OAT;
 
         #[TypeScript]
-        #[Oat\Schema()]
+        #[Oat\Schema(name: '$schemaName')]
         class $file_class_name extends Data
         {
             public function __construct(
