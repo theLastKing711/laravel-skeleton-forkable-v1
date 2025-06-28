@@ -206,7 +206,9 @@ class CreateDataFile extends Command
             namespace App\Data\\$pagination_path;
 
             use App\Data\Shared\Pagination\QueryParameters\PaginationQueryParameterData;
+            use OpenApi\Attributes as OAT;
 
+            #[Oat\Schema()]
             class $pagination_file_class_name extends PaginationQueryParameterData
             {
                 public function __construct(
