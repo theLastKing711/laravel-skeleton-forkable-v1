@@ -7,7 +7,7 @@ use OpenApi\Attributes as OAT;
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_PROPERTY | \Attribute::TARGET_PARAMETER | \Attribute::TARGET_CLASS_CONSTANT | \Attribute::IS_REPEATABLE)]
 class DateProperty extends OAT\Property
 {
-    public function __construct(string $default = '2024-09-02 18:31:45')
+    public function __construct(string $default = '2024-09-02')
     {
         parent::__construct(
             schema: 'string',
@@ -15,7 +15,7 @@ class DateProperty extends OAT\Property
             format: 'datetime',
             default: $default,
             pattern: 'YYYY-MM-DD',
-            example: '2024-09-02 18:31:45',
+            example: '2024-09-02',
         );
     }
 }

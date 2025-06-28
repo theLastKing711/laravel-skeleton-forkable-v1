@@ -268,7 +268,7 @@ class CreateDataFile extends Command
             use OpenApi\Attributes as OAT;
 
             #[TypeScript]
-            #[Oat\Schema(name: '$schemaName')]
+            #[Oat\Schema(schema: '$schemaName$response_item_file_class_name')]
             class $response_item_file_class_name extends Data
             {
                 public function __construct(
@@ -307,7 +307,7 @@ class CreateDataFile extends Command
 
 
             #[TypeScript]
-            #[Oat\Schema(name: '$schemaName')]
+            #[Oat\Schema(schema: '$schemaName$file_class_name')]
             class $file_class_name  extends PaginationResultData
             {
                 /** @param Collection<int, $child_class_name> \$data */
@@ -360,7 +360,7 @@ class CreateDataFile extends Command
 
 
             #[TypeScript]
-            #[Oat\Schema(name: '$schemaName')]
+            #[Oat\Schema(schema: '$schemaName$file_class_name')]
             class $file_class_name extends Data
             {
                 public function __construct(
@@ -394,7 +394,7 @@ class CreateDataFile extends Command
         use OpenApi\Attributes as OAT;
 
         #[TypeScript]
-        #[Oat\Schema(name: '$schemaName')]
+        #[Oat\Schema(schema: '$schemaName$file_class_name')]
         class $file_class_name extends Data
         {
             public function __construct(
