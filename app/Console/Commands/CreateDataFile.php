@@ -65,7 +65,7 @@ class CreateDataFile extends Command
                 $class_name[count($class_name) - 1];
 
             $file_class_name =
-                $file_name.'PathParameterData';
+                $file_name.'Data';
 
             $ref =
                 $main_route.$file_name.'PathParameterData';
@@ -102,7 +102,7 @@ class CreateDataFile extends Command
             EOT;
 
             $written = Storage::disk('app')
-                ->put('Data'.'\\'.$this->argument('name').'PathParameterData.php', $fileContents);
+                ->put('Data'.'\\'.$this->argument('name').'Data.php', $fileContents);
 
             if ($written) {
                 $this->info('Created new Repo '.$this->argument('name').'Repository.php in App\Repositories.');

@@ -13,7 +13,7 @@ class CreateInvokableControllerWithData extends Command
      *
      * @var string
      */
-    protected $signature = 'make:data-controller {name} {--request==} {--query==} {--post==} {--post-form==} {--patch==} {--patch-form==} {--get-one==} {--get-many==} {--delete-one==} {--delete-many==} {--pagination==}';
+    protected $signature = 'make:data-controller {name} {--request==} {--model==} {--query==} {--post==} {--post-form==} {--patch==} {--patch-form==} {--get-one==} {--get-many==} {--delete-one==} {--delete-many==} {--pagination==} {--abstract}';
 
     /**
      * The console command description.
@@ -27,6 +27,16 @@ class CreateInvokableControllerWithData extends Command
      */
     public function handle()
     {
+
+        $model_option = $this->option('model');
+
+        $model_path =
+            $model_option
+            ?
+            'use App\\Models\\'.$model_option.';'
+            :
+            '';
+
         /** @var string $path */
         $path =
             str_replace(
@@ -79,11 +89,16 @@ class CreateInvokableControllerWithData extends Command
         $data_path_option = $this->option('request');
 
         if ($data_path_option) {
+
+            $should_include_path =
+                $this->option('get-one') || $this->option('delete-one');
+
             Artisan::call('make:data', [
                 'name' => $data_path_option,
-                // '--path' => 'default',
+                '--path' => $should_include_path,
             ]);
         }
+
         $path_class_import = '';
 
         $path_variable_declaration = '';
@@ -98,17 +113,17 @@ class CreateInvokableControllerWithData extends Command
             $path_option = $this->option('request');
 
             $path_path =
-            str_replace(
-                '/',
-                '\\',
-                $path_option
-            );
+                str_replace(
+                    '/',
+                    '\\',
+                    $path_option
+                );
 
             $path_option_array =
-            explode(
-                '\\',
-                $path_path,
-            );
+                explode(
+                    '\\',
+                    $path_path,
+                );
 
             $path_data_class =
                 // $path_option_array[count($path_option_array) - 1].'Data';
@@ -352,6 +367,7 @@ class CreateInvokableControllerWithData extends Command
 
             Artisan::call('make:data', [
                 'name' => $patch_option,
+                '--path' => true,
             ]);
 
             return;
@@ -394,16 +410,7 @@ class CreateInvokableControllerWithData extends Command
             use App\Data\Shared\Swagger\Response\SuccessItemResponse;
             use OpenApi\Attributes as OAT;
 
-            #[
-                OAT\PathItem(
-                    path: '/$main_route/{id}',
-                    parameters: [
-                        new OAT\PathParameter(
-                            ref: '#/components/parameters/$path_ref',
-                        ),
-                    ],
-                ),
-            ]
+
             class $file_class_name extends Controller
             {
 
@@ -411,7 +418,9 @@ class CreateInvokableControllerWithData extends Command
                 #[SuccessItemResponse($get_one_data_name)]
                 public function __invoke($path_variable_declaration)
                 {
-
+                    return $get_one_data_class::from(
+                        
+                    );
                 }
             }
 
@@ -447,7 +456,7 @@ class CreateInvokableControllerWithData extends Command
 
             $this->info($this->option('pagination'));
 
-            $pagination_option = $this->hasOption('pagination');
+            $pagination_option = $this->option('pagination');
 
             $get_many_path =
             str_replace(
@@ -515,6 +524,11 @@ class CreateInvokableControllerWithData extends Command
 
                 $pagination_path = $get_many_path.'PaginationResultData';
 
+                $response_path = $get_many_path.'Data';
+
+                $resposne_class =
+                    $get_many_data_class_without_data.'Data';
+
                 $query_parameter_path_with_Data = $query_parameter_path.'Data';
 
                 $fileContents = <<<EOT
@@ -526,6 +540,7 @@ class CreateInvokableControllerWithData extends Command
                 use App\Http\Controllers\Controller;
                 use App\Data\Shared\Swagger\Parameter\QueryParameter\QueryParameter;
                 use App\Data\\$pagination_path;
+                use App\Data\\$response_path;
                 use App\Data\Shared\Swagger\Response\SuccessItemResponse;
                 use OpenApi\Attributes as OAT;
 
@@ -538,7 +553,9 @@ class CreateInvokableControllerWithData extends Command
                     #[SuccessItemResponse($pagination_class::class)]
                     public function __invoke($query_file_class_name \$request)
                     {
+                        return $resposne_class::collect(
 
+                        );
                     }
                 }
 
@@ -583,7 +600,9 @@ class CreateInvokableControllerWithData extends Command
                 #[SuccessListResponse($get_many_data_name)]
                 public function __invoke($path_variable_declaration)
                 {
+                    return $get_many_data_class::collect(
 
+                    );
                 }
             }
 
@@ -762,7 +781,7 @@ class CreateInvokableControllerWithData extends Command
 
             use App\Http\Controllers\Controller;
             use App\Data\\$post_form_final_name;
-            use App\Data\Shared\Swagger\Request\JsonRequestBody;
+            use App\Data\Shared\Swagger\Request\FormDataRequestBody;
             use App\Data\Shared\Swagger\Response\SuccessNoContentResponse;
             use OpenApi\Attributes as OAT;
 
@@ -770,7 +789,7 @@ class CreateInvokableControllerWithData extends Command
             {
 
                 #[OAT\Post(path: '/$main_route', tags: ['$tag'])]
-                #[JsonRequestBody($post_form_data_name)]
+                #[FormDataRequestBody($post_form_data_name)]
                 #[SuccessNoContentResponse]
                 public function __invoke($post_form_data_class \$request)
                 {
@@ -862,6 +881,64 @@ class CreateInvokableControllerWithData extends Command
             return;
         }
 
+        $abstract_option = $this->option('abstract');
+
+        if ($abstract_option != null) {
+
+            $abstract_path =
+                str_replace(
+                    '/',
+                    '\\',
+                    $abstract_option
+                );
+
+            $abstract_option_array =
+            explode(
+                '\\',
+                $abstract_path,
+            );
+
+            $abstract_data_class =
+                $abstract_option_array[count($abstract_option_array) - 1].'Data';
+
+            $abstract_data_name =
+                $abstract_data_class.'::class';
+
+            $abstract_final_name = $abstract_path.'Data';
+
+            $fileContents = <<<EOT
+            <?php
+
+            namespace App\Http\Controllers\\$real_path;
+
+            use App\Http\Controllers\Controller;
+            use OpenApi\Attributes as OAT;
+
+            #[
+                OAT\PathItem(
+                    path: '/$main_route/{id}',
+                    parameters: [
+                        new OAT\PathParameter(
+                            ref: '#/components/parameters/$path_ref',
+                        ),
+                    ],
+                ),
+            ]
+            abstract class $file_class_name extends Controller
+            { }
+
+            EOT;
+
+            $written = Storage::disk('app')
+                ->put('Http\Controllers'.'\\'.$this->argument('name').'Controller.php', $fileContents);
+
+            Artisan::call('make:data', [
+                'name' => $abstract_option,
+            ]);
+
+            return;
+        }
+
         $fileContents = <<<EOT
             <?php
 
@@ -897,3 +974,15 @@ class CreateInvokableControllerWithData extends Command
 
     }
 }
+
+// get-one controller old path parameter
+// #[
+//     OAT\PathItem(
+//         path: '/$main_route/{id}',
+//         parameters: [
+//             new OAT\PathParameter(
+//                 ref: '#/components/parameters/$path_ref',
+//             ),
+//         ],
+//     ),
+// ]
