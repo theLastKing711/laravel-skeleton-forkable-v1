@@ -25,10 +25,11 @@ return [
     // and replace it with 'http://localhost:8000' and 'https://localhost:8000'
     // or host and port of php artisan serve if it is different
     'stateful' => [
-        '*',
-        // 'http://localhost',
-        // 'http://localhost:8000'
-        //  'https://localhost:8000'
+        // '*',
+        'http://localhost:8000',
+        'https://localhost:8000',
+        'http://localhost:5173',
+        'https://localhost:5173',
         // 'http://localhost:8080',
         // 'http://localhost:5173',
         // 'http://localhost:5174',
