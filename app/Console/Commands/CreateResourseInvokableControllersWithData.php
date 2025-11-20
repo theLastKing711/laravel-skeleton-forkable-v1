@@ -11,6 +11,8 @@ class CreateResourseInvokableControllersWithData extends Command
      * The name and signature of the console command.
      *
      * @var string
+     *             example
+     *             php artian make:resourse-data-controller Admin\Product --with-pagination
      */
     protected $signature = 'make:resourse-data-controller {path} {--with-pagination} {--post==} {--patch==} {--get-one==} {--get-many==} {--delete-one==} {--without-post} {--without-get-one} {--without-get-many} {--without-patch} {--without-delete-one}';
 
