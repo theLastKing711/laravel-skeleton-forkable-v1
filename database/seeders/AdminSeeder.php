@@ -1,29 +1,58 @@
 <?php
 
-namespace Database\Seeders;
+namespace Database\Factories;
 
+use App\Enum\Auth\RolesEnum;
 use App\Models\User;
-use Illuminate\Database\Seeder;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
-class AdminSeeder extends Seeder
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
+ */
+class UserFactory extends Factory
 {
     /**
-     * Run the database seeds.
+     * The current password being used by the factory.
      */
-    public function run(): void
+    protected static ?string $password;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
     {
-        $this->seedAdmins();
+        return [
+            'name' => fake()->name(),
+            'email' => fake()->unique()->safeEmail(),
+            'phone_number' => fake()->phoneNumber(),
+            'email_verified_at' => now(),
+            'password' => static::$password ??= Hash::make('password'),
+            'remember_token' => Str::random(10),
+        ];
     }
 
-    public function seedAdmins(): void
+    public function staticAdmin(): static
     {
-        User::factory()
-            ->staticAdmin()
-            ->create();
 
-        User::factory()
-            ->count(9)
-            ->admin()
-            ->create();
+        return $this->state(fn (array $attributes) => [
+            'name' => 'admin',
+            'email' => 'admin@admin.com',
+            'password' => Hash::make('admin'),
+        ])->afterCreating(function (User $user) {
+            $user->assignRole(RolesEnum::ADMIN);
+        });
+
+    }
+
+    public function admin(): static
+    {
+
+        return $this->afterCreating(function (User $user) {
+            $user->assignRole(RolesEnum::ADMIN);
+        });
     }
 }
