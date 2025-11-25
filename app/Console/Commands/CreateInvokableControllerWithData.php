@@ -69,6 +69,13 @@ class CreateInvokableControllerWithData extends Command
         $input_file_name =
             $class_name[count($class_name) - 1];
 
+        $resource_name =
+            $class_name[count($class_name) - 2];
+
+        $parent_controller = $resource_name.'Controller';
+
+        $resource_path = "use App\Models\\{$resource_name};";
+
         $file_class_name =
             $input_file_name.'Controller';
 
@@ -85,6 +92,8 @@ class CreateInvokableControllerWithData extends Command
         array_splice($augmented_path, -1, 1);
 
         $real_path = implode('\\', $augmented_path);
+
+        $parent_controller_path = "use App\Http\Controllers\\{$real_path}\Abstract\\{$parent_controller};";
 
         $data_path_option = $this->option('request');
 
@@ -229,13 +238,14 @@ class CreateInvokableControllerWithData extends Command
             namespace App\Http\Controllers\\$real_path;
 
 
-            use App\Http\Controllers\Controller;
+            $resource_path
+            $parent_controller_path
             use App\Data\\$post_final_name;
             use App\Data\Shared\Swagger\Request\JsonRequestBody;
             use App\Data\Shared\Swagger\Response\SuccessNoContentResponse;
             use OpenApi\Attributes as OAT;
 
-            class $file_class_name extends Controller
+            class $file_class_name extends $parent_controller
             {
 
                 #[OAT\Post(path: '/$main_route', tags: ['$tag'])]
@@ -243,6 +253,14 @@ class CreateInvokableControllerWithData extends Command
                 #[SuccessNoContentResponse]
                 public function __invoke($post_data_class \$request)
                 {
+
+                    $resource_name
+                        ::query()
+                        ->create(
+                            [
+                                'key' => 'value'
+                            ]
+                        );
 
                 }
             }
@@ -271,20 +289,11 @@ class CreateInvokableControllerWithData extends Command
 
                 namespace App\Http\Controllers\\$real_path;
 
+                $parent_controller_path
                 use App\Http\Controllers\Controller;
                 use App\Data\Shared\Swagger\Response\SuccessNoContentResponse;
                 use OpenApi\Attributes as OAT;
 
-                #[
-                    OAT\PathItem(
-                        path: '/$main_route/{id}',
-                        parameters: [
-                            new OAT\PathParameter(
-                                ref: '#/components/parameters/$path_ref',
-                            ),
-                        ],
-                    ),
-                ]
                 class $file_class_name extends Controller
                 {
 
@@ -330,25 +339,15 @@ class CreateInvokableControllerWithData extends Command
 
             namespace App\Http\Controllers\\$real_path;
 
-
-            use App\Http\Controllers\Controller;
             $path_class_import
+            $resource_path
+            $parent_controller_path
             use App\Data\\$patch_final_name;
             use App\Data\Shared\Swagger\Request\JsonRequestBody;
             use App\Data\Shared\Swagger\Response\SuccessNoContentResponse;
             use OpenApi\Attributes as OAT;
 
-            #[
-                OAT\PathItem(
-                    path: '/$main_route/{id}',
-                    parameters: [
-                        new OAT\PathParameter(
-                            ref: '#/components/parameters/$path_ref',
-                        ),
-                    ],
-                ),
-            ]
-            class $file_class_name extends Controller
+            class $file_class_name extends $parent_controller
             {
 
                 #[OAT\Patch(path: '/$main_route/{id}', tags: ['$tag'])]
@@ -356,6 +355,18 @@ class CreateInvokableControllerWithData extends Command
                 #[SuccessNoContentResponse]
                 public function __invoke($path_variable_declaration $patch_data_class \$request)
                 {
+
+                    $resource_name
+                        ::query()
+                        ->firstWhere(
+                            'id',
+                            \$request->id
+                        )
+                        ->update(
+                            [
+                                'key' => 'value'
+                            ]
+                        );
 
                 }
             }
@@ -404,23 +415,31 @@ class CreateInvokableControllerWithData extends Command
 
             namespace App\Http\Controllers\\$real_path;
 
-            use App\Http\Controllers\Controller;
             $path_class_import
+            $resource_path
+            $parent_controller_path
             use App\Data\\$get_one_final_name;
             use App\Data\Shared\Swagger\Response\SuccessItemResponse;
             use OpenApi\Attributes as OAT;
 
 
-            class $file_class_name extends Controller
+            class $file_class_name extends $parent_controller
             {
 
                 #[OAT\Get(path: '/$main_route/{id}', tags: ['$tag'])]
                 #[SuccessItemResponse($get_one_data_name)]
                 public function __invoke($path_variable_declaration)
                 {
+
                     return $get_one_data_class::from(
-                        
+                        $resource_name
+                            ::query()
+                            ->firstWhere(
+                                'id',
+                                \$request->id
+                            )
                     );
+
                 }
             }
 
@@ -536,15 +555,16 @@ class CreateInvokableControllerWithData extends Command
 
                 namespace App\Http\Controllers\\$real_path;
 
+                $resource_path
+                $parent_controller_path
                 use App\Data\\$query_parameter_path_with_Data;
-                use App\Http\Controllers\Controller;
                 use App\Data\Shared\Swagger\Parameter\QueryParameter\QueryParameter;
                 use App\Data\\$pagination_path;
                 use App\Data\\$response_path;
                 use App\Data\Shared\Swagger\Response\SuccessItemResponse;
                 use OpenApi\Attributes as OAT;
 
-                class $file_class_name extends Controller
+                class $file_class_name extends $parent_controller
                 {
 
                     #[OAT\Get(path: '/$main_route', tags: ['$tag'])]
@@ -554,7 +574,9 @@ class CreateInvokableControllerWithData extends Command
                     public function __invoke($query_file_class_name \$request)
                     {
                         return $resposne_class::collect(
-
+                            $resource_name
+                                ::query()
+                                ->paginate()
                         );
                     }
                 }
@@ -587,13 +609,14 @@ class CreateInvokableControllerWithData extends Command
             namespace App\Http\Controllers\\$real_path;
 
             $query_class_import
-            use App\Http\Controllers\Controller;
+            $resource_path
+            $parent_controller_path
             $path_class_import
             use App\Data\\$get_many_final_name;
             use App\Data\Shared\Swagger\Response\SuccessListResponse;
             use OpenApi\Attributes as OAT;
 
-            class $file_class_name extends Controller
+            class $file_class_name extends $parent_controller
             {
 
                 #[OAT\Get(path: '/$main_route', tags: ['$tag'])]
@@ -601,7 +624,9 @@ class CreateInvokableControllerWithData extends Command
                 public function __invoke($path_variable_declaration)
                 {
                     return $get_many_data_class::collect(
-
+                        $resource_name
+                            ::query()
+                            ->get()
                     );
                 }
             }
@@ -648,29 +673,26 @@ class CreateInvokableControllerWithData extends Command
 
             namespace App\Http\Controllers\\$real_path;
 
-            use App\Http\Controllers\Controller;
+            $resource_path
+            $parent_controller_path
             use App\Data\\$delete_final_name;
             use App\Data\Shared\Swagger\Response\SuccessNoContentResponse;
             use OpenApi\Attributes as OAT;
 
-            #[
-                OAT\PathItem(
-                    path: '/$main_route/{id}',
-                    parameters: [
-                        new OAT\PathParameter(
-                            ref: '#/components/parameters/$path_ref',
-                        ),
-                    ],
-                ),
-            ]
-            class $file_class_name extends Controller
+            class $file_class_name extends $parent_controller
             {
 
                 #[OAT\Delete(path: '/$main_route/{id}', tags: ['$tag'])]
                 #[SuccessNoContentResponse]
                 public function __invoke($delete_data_class \$request)
                 {
-
+                    $resource_name
+                        ::query()
+                        ->firstWhere(
+                            'id',
+                            \$request->id
+                        )
+                        ->delete();
                 }
             }
 
@@ -681,6 +703,7 @@ class CreateInvokableControllerWithData extends Command
 
             Artisan::call('make:data', [
                 'name' => $delete_one_option,
+                '--path' => true,
             ]);
 
             return;
@@ -717,13 +740,14 @@ class CreateInvokableControllerWithData extends Command
 
             namespace App\Http\Controllers\\$real_path;
 
-            use App\Http\Controllers\Controller;
+            $resource_path
+            $parent_controller_path
             use App\Data\Shared\Swagger\Parameter\QueryParameter\ListQueryParameter;
             use App\Data\Shared\Swagger\Response\SuccessNoContentResponse;
             use App\Data\\$delete_many_final_form;
             use OpenApi\Attributes as OAT;
 
-            class $file_class_name extends Controller
+            class $file_class_name extends $parent_controller
             {
 
                 #[OAT\Delete(path: '/$main_route', tags: ['$tag'])]
@@ -731,7 +755,13 @@ class CreateInvokableControllerWithData extends Command
                 #[SuccessNoContentResponse]
                 public function __invoke($delete_many_data_name)
                 {
-
+                    $resource_name
+                        ::query()
+                        ->whereIn(
+                            'id',
+                            \$request->ids
+                        )
+                        ->delete();
                 }
             }
 
@@ -847,16 +877,6 @@ class CreateInvokableControllerWithData extends Command
             use App\Data\Shared\Swagger\Response\SuccessNoContentResponse;
             use OpenApi\Attributes as OAT;
 
-            #[
-                OAT\PathItem(
-                    path: '/$main_route/{id}',
-                    parameters: [
-                        new OAT\PathParameter(
-                            ref: '#/components/parameters/$path_ref',
-                        ),
-                    ],
-                ),
-            ]
             class $file_class_name extends Controller
             {
 
@@ -883,7 +903,7 @@ class CreateInvokableControllerWithData extends Command
 
         $abstract_option = $this->option('abstract');
 
-        if ($abstract_option != null) {
+        if ($abstract_option) {
 
             $abstract_path =
                 str_replace(
@@ -932,9 +952,9 @@ class CreateInvokableControllerWithData extends Command
             $written = Storage::disk('app')
                 ->put('Http\Controllers'.'\\'.$this->argument('name').'Controller.php', $fileContents);
 
-            Artisan::call('make:data', [
-                'name' => $abstract_option,
-            ]);
+            // Artisan::call('make:data', [
+            //     'name' => $abstract_option,
+            // ]);
 
             return;
         }

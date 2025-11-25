@@ -28,6 +28,7 @@ class UserFactory extends Factory
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
+            'phone_number' => fake()->phoneNumber(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
@@ -36,18 +37,18 @@ class UserFactory extends Factory
 
     public function staticAdmin(): static
     {
-        return $this->afterCreating(function (User $user) {
+        return $this->state(fn (array $attributes) => [
+            'name' => 'admin',
+            'email' => 'admin@admin.com',
+            'password' => Hash::make('admin'),
+        ])->afterCreating(function (User $user) {
             $user->assignRole(RolesEnum::ADMIN);
         });
     }
 
     public function admin(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'name' => 'admin',
-            'email' => 'admin@admin.com',
-            'password' => Hash::make('admin'),
-        ])->afterCreating(function (User $user) {
+        return $this->afterCreating(function (User $user) {
             $user->assignRole(RolesEnum::ADMIN);
         });
     }

@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class CreateDataFile extends Command
 {
@@ -54,21 +55,43 @@ class CreateDataFile extends Command
         $schemaName =
                str_replace('\\', '', $real_path);
 
-        if ($this->option('path')) {
+        $path_option = $this->option('path');
+
+        if ($path_option) {
 
             $main_route =
-            strtolower(
-                $class_name[0]
-            ).'s';
+            Str::plural(
+                strtolower(
+                    strtolower(
+
+                        $class_name[0]
+                    )
+                )
+            );
+            // strtolower(
+            //
+            // ).'s';
 
             $file_name =
-                $class_name[count($class_name) - 1];
+                $class_name[count(value: $class_name) - 1];
 
             $file_class_name =
                 $file_name.'Data';
 
             $ref =
                 $main_route.$file_name.'PathParameterData';
+
+            $resource_name =
+            Str::plural(
+                strtolower(
+                    $class_name[count(value: $class_name) - 4]
+                )
+            );
+            // strtolower(
+            //     $class_name[count(value: $class_name) - 4]
+            // )
+            //   .
+            //   's';
 
             $fileContents = <<<EOT
             <?php
@@ -92,7 +115,7 @@ class CreateDataFile extends Command
                             ),
                         ),
                         FromRouteParameter('id'),
-                        Exists('$main_route', 'id')
+                        Exists('$resource_name', 'id')
                     ]
                     public int \$id,
                 ) {
@@ -416,4 +439,18 @@ class CreateDataFile extends Command
             $this->info('Something went wrong');
         }
     }
+
+    // private function pluralize($word)
+    // {
+    //     $irregulars = [
+    //         'company' => 'companies',
+    //     ];
+
+    //     if (array_key_exists($word, $irregulars)) {
+    //         return $irregulars[$word];
+    //     }
+
+    //     return $word.'s';
+
+    // }
 }

@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Str;
 
 class CreateResourseInvokableControllersWithData extends Command
 {
@@ -79,15 +80,16 @@ class CreateResourseInvokableControllersWithData extends Command
 
         Artisan::call('make:data-controller', [
             'name' => $abstract_name,
-            '--abstract',
+            '--abstract' => true,
         ]);
     }
 
     private function generateGetManyController($path, $resourse, ?string $action)
     {
         $resourse_plural =
-            $resourse
-                .'s';
+            Str::plural(
+                $resourse
+            );
 
         $action =
             $action ??
@@ -115,8 +117,9 @@ class CreateResourseInvokableControllersWithData extends Command
     {
 
         $resourse_plural =
-            $resourse
-                .'s';
+            Str::plural(
+                $resourse
+            );
 
         $action =
             $action ??
