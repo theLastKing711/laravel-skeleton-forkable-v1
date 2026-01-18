@@ -52,4 +52,45 @@ class UserFactory extends Factory
             $user->assignRole(RolesEnum::ADMIN);
         });
     }
+
+    public function user(): static
+    {
+        return $this->afterCreating(function (User $user) {
+            $user->assignRole(RolesEnum::USER);
+        });
+    }
+
+    public function staticStore(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'name' => 'store',
+            'email' => 'store@admin.com',
+            'phone_number' => '0968259851',
+            'password' => Hash::make('2280'),
+        ])->afterCreating(function (User $user) {
+            $user->assignRole(RolesEnum::STORE);
+        });
+    }
+
+    public function staticUser(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'name' => 'user',
+            'email' => 'user@user.com',
+            'phone_number' => '0968259852',
+            'password' => Hash::make('2280'),
+        ])->afterCreating(function (User $user) {
+            $user->assignRole(RolesEnum::USER);
+        });
+    }
+
+    public function withPhoneAndPasswordAuth(string $phone_number, string $password): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'phone_number' => $phone_number,
+            'password' => Hash::make($password),
+        ])->afterCreating(function (User $user) {
+            $user->assignRole(RolesEnum::USER);
+        });
+    }
 }

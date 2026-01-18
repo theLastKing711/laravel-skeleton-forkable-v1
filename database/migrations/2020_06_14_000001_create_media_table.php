@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateMediaTable extends Migration
 {
@@ -15,14 +15,15 @@ class CreateMediaTable extends Migration
             $table->string('file_name');
             $table->string('file_type')->nullable();
             $table->unsignedBigInteger('size');
+            $table->string('collection_name');
+            $table->string('thumbnail_url');
+            $table->string('public_id');
             $table->timestamps();
         });
     }
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down(): void
     {

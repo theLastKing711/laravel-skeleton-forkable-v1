@@ -2,23 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use App\Data\Shared\File\CloudinaryNotificationUrlRequestData;
 use App\Data\Shared\File\PathParameters\FilePublicIdPathParameterData;
 use App\Data\Shared\File\UploadFileData;
 use App\Data\Shared\File\UploadFileListData;
 use App\Data\Shared\File\UploadFileResponseData;
+use App\Data\Shared\Swagger\Property\QueryParameter;
 use App\Data\Shared\Swagger\Request\FormDataRequestBody;
 use App\Data\Shared\Swagger\Response\SuccessItemResponse;
 use App\Data\Shared\Swagger\Response\SuccessListResponse;
 use App\Data\Shared\Swagger\Response\SuccessNoContentResponse;
+use App\Enum\FileUploadDirectory;
 use App\Models\Media;
 use App\Models\TemporaryUploadedImages;
 use App\Models\User;
+use Cloudinary\Api\ApiUtils;
+use Cloudinary\Asset\Image;
+use Cloudinary\Configuration\CloudConfig;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use OpenApi\Attributes as OAT;
+use OpenApi\Attributes\RequestBody;
 
 #[
     OAT\PathItem(
@@ -72,9 +79,9 @@ class FileController extends Controller
         $result = Cloudinary::upload($file_path, [
             'eager' => [ // list of transformation objects -> https://cloudinary.com/documentation/transformation_reference
                 [
-                    'width' => 500,
+                    'width' => 400,
                     // 'height' => 500,
-                    'crop' => 'pad',
+                    // 'crop' => 'pad',
                     // 'pad',
                     // 'scale' => 'auto',
                 ],
@@ -314,12 +321,27 @@ class FileController extends Controller
 
         Log::info('file public id  {data}', ['data' => $deleteFileData->public_id]);
 
+        $public_id =
+              str_replace(
+                  '-',
+                  '/',
+                  $deleteFileData->public_id,
+              );
+
+        // if image is created before parent model is created (i.e on create page)
         TemporaryUploadedImages::query()
             ->firstWhere(
                 'public_id',
-                $deleteFileData->public_id
+                $public_id
             )
-            ->delete();
+            ?->delete();
+
+        // if image is created after parent model is created(i.e on update page)
+        Media::firstWhere(
+            'public_id',
+            $public_id
+        )
+            ?->delete();
 
         // $uploaded_car_images_session_key = config('constants.session.upload_car_images');
         // /** @var Collection<int, Media> $user_car_medias */
@@ -345,5 +367,104 @@ class FileController extends Controller
         Cloudinary::destroy($deleteFileData->public_id);
 
         return true;
+    }
+
+    #[OAT\Get(path: '/files/cloudinary-presigned-url', tags: ['files'])]
+    #[SuccessItemResponse('string', 'Fetched presigned upload successfully')]
+    public function getCloudinaryPresignedUrl()
+    {
+
+        $paramsToSign = [
+            'timeStamp' => time(),
+            'folder' => 'mobiles_market',
+        ];
+
+        // https://cloudinary.com/documentation/authentication_signatures
+        ApiUtils::signRequest(
+            $paramsToSign,
+            new CloudConfig()
+                ->setCloudConfig(
+                    CloudConfig::API_SECRET,
+                    config('cloudinary.api_secret')
+                )
+        );
+
+        return [
+            ...$paramsToSign,
+            'api_key' => config('cloudinary.api_key'),
+            'folder' => 'mobiles_market',
+            'cloud_name' => config('cloudinary.cloud_name'),
+        ];
+
+        return $signed_url;
+
+    }
+
+    #[OAT\Get(path: '/files/cloudinary-presigned-urls', tags: ['files'])]
+    #[QueryParameter('urls_count')]
+    #[QueryParameter('resource')]
+    #[SuccessItemResponse('string', 'Fetched presigned upload successfully')]
+    public function getCloudinaryPresignedUrls(Request $request)
+    {
+
+        $urls_list =
+            Collection::times($request->urls_count, fn ($number) => $number); // [1, 2, 3, 4, 5]
+
+        $presigned_uploads_data =
+            $urls_list
+                ->map(
+                    function ($item, $index) {
+
+                        $timeStamp = time() + ($index * 10000);
+
+                        // $timeStamp = time();
+
+                        // to make sure signature is unique since paramsToSign are same in loop
+                        // $timeStamp = time() + $index;
+                        // sleep(0.1);
+
+                        $paramsToSign = [
+                            'timestamp' => $timeStamp,
+                            // 'public_id' => 'sample_image',
+                            'eager' => 't_thumbnail|t_main',
+                            'folder' => FileUploadDirectory::MOBILE_OFFERS->value,
+                            // 'tags' => FileUploadDirectory::MOBILE_OFFERS->value,
+                            // 'context' => "resourse={$request->resource}",
+                            // 'context' => 'caption=My new image|author=John Doe',
+                            // 'eager_async' => true,
+                        ];
+
+                        // https://cloudinary.com/documentation/authentication_signatures
+                        $signature = ApiUtils::signParameters(
+                            $paramsToSign,
+                            config('cloudinary.api_secret')
+                        );
+
+                        return [
+                            ...$paramsToSign,
+                            'signature' => $signature,
+                            'api_key' => config('cloudinary.api_key'),
+                            'cloud_name' => config('cloudinary.cloud_name'),
+                        ];
+
+                    }
+                );
+
+        return $presigned_uploads_data;
+
+    }
+
+    #[OAT\Post(path: '/files/mobile-offer-cloudinary-notifications-url', tags: ['files'])]
+    #[RequestBody(CloudinaryNotificationUrlRequestData::class)]
+    #[SuccessNoContentResponse]
+    public function mobileOfferCloudinaryNotificationUrl(CloudinaryNotificationUrlRequestData $request)
+    {
+
+        return
+           Auth::User()
+               ->temporaryUploadMobileOfferImageFromCloudinaryNotification(
+                   $request
+               );
+
     }
 }

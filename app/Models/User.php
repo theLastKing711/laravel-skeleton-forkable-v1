@@ -3,8 +3,11 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Enum\Auth\RolesEnum;
+use App\Interfaces\IUploadable;
+use App\Trait\Uploadable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -60,10 +63,10 @@ use Spatie\Permission\Traits\HasRoles;
  *
  * @mixin \Eloquent
  */
-class User extends Authenticatable
+class User extends Authenticatable implements IUploadable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, HasRoles, Notifiable;
+    use HasApiTokens, HasFactory, HasRoles, Notifiable, Uploadable;
 
     /**
      * The attributes that are mass assignable.
@@ -86,12 +89,14 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    /**
-     * Get all of the temporaryUploadedImages for the User
-     */
-    public function temporaryUploadedImages(): HasMany
+    public function scopeAdmin($query)
     {
-        return $this->hasMany(TemporaryUploadedImages::class);
+        $query->role(RolesEnum::ADMIN);
+    }
+
+    public function scoeUser($query)
+    {
+        $query->role(RolesEnum::USER);
     }
 
     /**

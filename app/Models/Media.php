@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Enum\FileUploadDirectory;
 use CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -56,8 +58,8 @@ class Media extends \CloudinaryLabs\CloudinaryLaravel\Model\Media
     protected $table = 'media';
 
     // we did made this custom media class that ovveride cloudinary's
-    //to allow usage of factory for the model
-    //and possibly add more features for the model in the future
+    // to allow usage of factory for the model
+    // and possibly add more features for the model in the future
     use HasFactory;
 
     public static function fromCloudinaryUploadResponse(CloudinaryEngine $response_file): self
@@ -80,5 +82,113 @@ class Media extends \CloudinaryLabs\CloudinaryLaravel\Model\Media
         $media->file_type = $response_file->getFileType();
 
         return $media;
+    }
+
+    public static function fromTemporaryUploadedImage(TemporaryUploadedImages $temporaryUploadedImage): self
+    {
+
+        $media = new Media;
+
+        // $media->uid = $temporaryUploadedImage->uid;
+        $media->file_name = $temporaryUploadedImage->file_name;
+        $media->file_url = $temporaryUploadedImage->file_url;
+        $media->size = $temporaryUploadedImage->size;
+        $media->file_type = $temporaryUploadedImage->file_type;
+        $media->collection_name = $temporaryUploadedImage->collection_name;
+        $media->thumbnail_url = $temporaryUploadedImage->thumbnail_url;
+        $media->public_id = $temporaryUploadedImage->public_id;
+
+        return $media;
+
+    }
+
+    /**
+     * undocumented function summary
+     *
+     * Undocumented function long description
+     *
+     * @return Collection<Media>
+     **/
+    public static function createFromTemporaryUploadedImagesIds(array $temporaryUploadedImagesIds)
+    {
+
+        $medias =
+            static::fromTemporaryUploadedImagesIds(
+                temporaryUploadedImagesIds: $temporaryUploadedImagesIds
+            );
+
+        TemporaryUploadedImages::query()
+            ->whereIn(
+                'id',
+                values: $temporaryUploadedImagesIds
+            )
+            ->delete();
+
+        return $medias;
+
+    }
+
+    /**
+     * undocumented function summary
+     *
+     * Undocumented function long description
+     *
+     * @return Collection<Media>
+     **/
+    public static function fromTemporaryUploadedImagesIds(array $temporaryUploadedImagesIds)
+    {
+
+        $temporary_uploaded_images =
+            TemporaryUploadedImages::query()
+                ->whereIn(
+                    'id',
+                    $temporaryUploadedImagesIds
+                )
+                ->get();
+
+        $medias =
+            $temporary_uploaded_images
+                ->map(
+                    function (TemporaryUploadedImages $temporaryUploadedImage) {
+                        return static::fromTemporaryUploadedImage(
+                            $temporaryUploadedImage
+                        );
+                    }
+                );
+
+        return $medias;
+
+    }
+
+    public function generateFakeFromUrl(string $url)
+    {
+        return [
+            'file_url' => $url,
+            'file_name' => $url,
+            'file_type' => 'webp',
+            'size' => 4000,
+            'collection_name' => FileUploadDirectory::MOBILE_OFFERS,
+            'thumbnail_url' => $url,
+            'public_id' => $url,
+        ];
+    }
+
+    public function generateFakesFromUrl(string $url, int $count)
+    {
+        $array = range(0, $count);
+
+        $images =
+            collect(
+                $array
+            )->map(
+                function (int $item) use ($url) {
+                    static::generateFakeFromUrl(
+                        $url
+                    );
+                }
+            )
+                ->toArray();
+
+        return $images;
     }
 }
