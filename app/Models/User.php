@@ -94,7 +94,12 @@ class User extends Authenticatable implements IUploadable
         $query->role(RolesEnum::ADMIN);
     }
 
-    public function scoeUser($query)
+    public function scopeStore($query)
+    {
+        $query->role(RolesEnum::STORE);
+    }
+
+    public function scopeUser($query)
     {
         $query->role(RolesEnum::USER);
     }

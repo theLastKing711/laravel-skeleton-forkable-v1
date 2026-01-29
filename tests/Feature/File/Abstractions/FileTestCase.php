@@ -1,15 +1,16 @@
 <?php
 
-namespace Tests\Feature\User\Abstractions;
+namespace Tests\Feature\File\Abstractions;
 
 use App\Helpers\RotueBuilder\RouteBuilder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Tests\Traits\StoreTrait;
 
-class UserTestCase extends TestCase
+class FileTestCase extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, StoreTrait;
 
     protected function setUp(): void
     {
@@ -17,10 +18,15 @@ class UserTestCase extends TestCase
 
         $this
             ->route_builder =
-                RouteBuilder::withMainRoute('users');
+                RouteBuilder::withMainRoute(
+                    'files'
+                );
 
         $this->seed([
             RolesAndPermissionsSeeder::class,
         ]);
+
+        $this->initializeStore();
+
     }
 }

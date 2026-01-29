@@ -30,10 +30,22 @@ class LoginController extends Controller
                 ->firstWhere(
                     [
                         'phone_number' => $request_phone_number,
+                        // 'password' => $request->password,
                     ]
                 );
 
+        if (! $authenticated_user) {
+            return response(
+                [
+                    'message' => 'كلمة المرور لرقم الهاتف غير صحيحة',
+                ],
+                HttpStatusCode::UNAUTHORIZED
+            );
+        }
+
         if ($authenticated_user && ! Hash::check($request->password, $authenticated_user->password)) {
+
+            // if ($authenticated_user === null) {
 
             return response(
                 [
@@ -45,7 +57,9 @@ class LoginController extends Controller
 
         $token =
             $authenticated_user
-                ->createToken($request_phone_number);
+                ->createToken(
+                    $request_phone_number
+                );
 
         /** @var Role $user_role description */
         $user_role =

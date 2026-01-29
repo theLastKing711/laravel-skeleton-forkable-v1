@@ -4,6 +4,8 @@ use App\Enum\Auth\RolesEnum;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\ExampleController;
 use App\Http\Controllers\FileController;
+use App\Http\Controllers\User\Auth\ChangePasswordController;
+use App\Http\Controllers\User\Auth\ChangePhoneNumberController;
 use App\Http\Controllers\User\Auth\GetUserPhoneNumberController;
 use App\Http\Controllers\User\Auth\Login\AddPhoneNumberLoginStepController;
 use App\Http\Controllers\User\Auth\Login\LoginController;
@@ -20,12 +22,10 @@ Route::prefix('files')
         ]
     )
     ->group(function () {
-        Route::get('', [FileController::class, 'index']);
         Route::post('', [FileController::class, 'store']);
         Route::delete('{public_id}', [FileController::class, 'delete']);
-        Route::get('cloudinary-presigned-url', [FileController::class, 'getCloudinaryPresignedUrl']);
-        Route::get('cloudinary-presigned-urls', [FileController::class, 'getCloudinaryPresignedUrls']);
-        Route::post('mobile-offer-cloudinary-notifications-url', [FileController::class, 'mobileOfferCloudinaryNotificationUrl']);
+        Route::get('cloudinary-presigned-urls', [FileController::class, 'getTestCloudinaryPresignedUrls']);
+        Route::post('cloudinary-notifications-url', [FileController::class, 'saveTemporaryUploadedImageToDBOnCloudinaryUploadNotificationSuccess']);
     });
 
 Route::prefix('admins')
@@ -79,22 +79,22 @@ Route::prefix('users')
 
                 Route::prefix('auth')->group(function () {
 
-                    Route::prefix('login')->group(function () {
-
-                        Route::post('phone-number-step', AddPhoneNumberLoginStepController::class);
-                        Route::post('login', LoginController::class);
-
-                    });
-
                     Route::get('get-user-phone-number', GetUserPhoneNumberController::class);
-                    // Route::patch('change-password', ChangePasswordController::class);
-                    // Route::patch('change-phone-number', ChangePhoneNumberController::class);
+                    Route::patch('change-password', ChangePasswordController::class);
+                    Route::patch('change-phone-number', ChangePhoneNumberController::class);
 
                 });
 
             });
 
         Route::prefix('auth')->group(function () {
+
+            Route::prefix('login')->group(function () {
+
+                Route::post('phone-number-step', AddPhoneNumberLoginStepController::class);
+                Route::post('login', LoginController::class);
+
+            });
 
             Route::prefix('registeration')->group(function () {
 

@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
-use App\Enum\FileUploadDirectory;
-use CloudinaryLabs\CloudinaryLaravel\CloudinaryEngine;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Collection as SupportCollection;
 
 /**
  * @property int $id
@@ -53,35 +53,22 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @mixin \Eloquent
  */
-class Media extends \CloudinaryLabs\CloudinaryLaravel\Model\Media
+class Media extends Model
 {
     protected $table = 'media';
 
     // we did made this custom media class that ovveride cloudinary's
     // to allow usage of factory for the model
     // and possibly add more features for the model in the future
+    /** @use HasFactory<\Database\Factories\MediaFactory> */
     use HasFactory;
 
-    public static function fromCloudinaryUploadResponse(CloudinaryEngine $response_file): self
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphTo<User, $this>
+     */
+    public function medially(): MorphTo
     {
-
-        $response =
-            $response_file
-                ->getResponse();
-
-        $first_eager_response =
-            $response['eager'][0];
-
-        $media = new Media;
-        $media->file_name = $response_file->getFileName();
-        // $media->file_url = $response_file->getSecurePath();
-        // $media->file_url = $response_file->getSecurePath();
-        $media->file_url = $first_eager_response['secure_url'];
-        // $media->size = $first_eager_response->getSize();
-        $media->size = $first_eager_response['bytes'];
-        $media->file_type = $response_file->getFileType();
-
-        return $media;
+        return $this->morphTo();
     }
 
     public static function fromTemporaryUploadedImage(TemporaryUploadedImages $temporaryUploadedImage): self
@@ -103,13 +90,9 @@ class Media extends \CloudinaryLabs\CloudinaryLaravel\Model\Media
     }
 
     /**
-     * undocumented function summary
-     *
-     * Undocumented function long description
-     *
      * @return Collection<Media>
      **/
-    public static function createFromTemporaryUploadedImagesIds(array $temporaryUploadedImagesIds)
+    public static function createFromTemporaryUploadedImagesIds(array|SupportCollection $temporaryUploadedImagesIds)
     {
 
         $medias =
@@ -129,13 +112,9 @@ class Media extends \CloudinaryLabs\CloudinaryLaravel\Model\Media
     }
 
     /**
-     * undocumented function summary
-     *
-     * Undocumented function long description
-     *
      * @return Collection<Media>
      **/
-    public static function fromTemporaryUploadedImagesIds(array $temporaryUploadedImagesIds)
+    public static function fromTemporaryUploadedImagesIds(array|SupportCollection $temporaryUploadedImagesIds)
     {
 
         $temporary_uploaded_images =
@@ -158,37 +137,5 @@ class Media extends \CloudinaryLabs\CloudinaryLaravel\Model\Media
 
         return $medias;
 
-    }
-
-    public function generateFakeFromUrl(string $url)
-    {
-        return [
-            'file_url' => $url,
-            'file_name' => $url,
-            'file_type' => 'webp',
-            'size' => 4000,
-            'collection_name' => FileUploadDirectory::MOBILE_OFFERS,
-            'thumbnail_url' => $url,
-            'public_id' => $url,
-        ];
-    }
-
-    public function generateFakesFromUrl(string $url, int $count)
-    {
-        $array = range(0, $count);
-
-        $images =
-            collect(
-                $array
-            )->map(
-                function (int $item) use ($url) {
-                    static::generateFakeFromUrl(
-                        $url
-                    );
-                }
-            )
-                ->toArray();
-
-        return $images;
     }
 }

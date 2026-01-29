@@ -6,9 +6,11 @@ enum FileUploadDirectory: string
 {
     // case PROJECT_DIRECTORY = 'mobiles_market';
 
-    case USER_PROFILE_PICTURE = 'profile_picture';
+    case USER_PROFILE_PICTURE = 'mobiles_market/profile_picture';
 
     case MOBILE_OFFERS = 'mobiles_market/mobile_offers';
+
+    case TEST_FOLDER = 'test_folder';
 
     // case DRIVER = 'driver';
 

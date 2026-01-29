@@ -21,6 +21,11 @@ return [
     */
     'notification_url' => env('CLOUDINARY_NOTIFICATION_URL'),
 
+    'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+
+    'api_key' => env('CLOUDINARY_KEY'),
+
+    'api_secret' => env('CLOUDINARY_SECRET'),
 
     /*
     |--------------------------------------------------------------------------
@@ -32,11 +37,10 @@ return [
     |
     |
     */
-    'cloud_url' => env('CLOUDINARY_URL'),
+    'cloud_url' => env('CLOUDINARY_URL', 'cloudinary://'.env('CLOUDINARY_KEY').':'.env('CLOUDINARY_SECRET').'@'.env('CLOUDINARY_CLOUD_NAME')),
 
     /**
      * Upload Preset From Cloudinary Dashboard
-     *
      */
     'upload_preset' => env('CLOUDINARY_UPLOAD_PRESET'),
 

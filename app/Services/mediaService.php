@@ -2,82 +2,99 @@
 
 namespace App\Services;
 
-use App\Data\Shared\File\UpdateFileData;
-use App\Data\Shared\Media\ModelAndMediable;
+use App\Data\Shared\File\CloudinaryNotificationUrlRequestData;
+use App\Enum\FileUploadDirectory;
+use App\Exceptions\Api\Cloudinary\FailedToDeleteImageException;
+use App\Facades\CloudUploadService;
 use App\Models\Media;
-use Cloudinary;
-use Cloudinary\Api\Exception\ApiError;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
+use App\Models\TemporaryUploadedImages;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class mediaService
 {
-    /**
-     * Delete all/one/multiple file(s) associated with a particular Model record
-     *
-     * @param  UpdateFileData[]|Collection<UpdateFileData>  $request_files
-     * @return void
-     *
-     * @throws ApiError
-     */
-    public function updateMediaForModel(ModelAndMediable $model, array|Collection $request_files)
-    {
-        /** @var Collection<int, string> $file_to_update_ids */
-        $file_to_update_ids = $request_files->pluck('uid');
+    public function createTemporaryUploadedImageFromCloudinaryUploadSuccessNotification(
+        CloudinaryNotificationUrlRequestData $cloudinaryNotificationUrlRequestData,
+        FileUploadDirectory $file_upload_directory
+    ): TemporaryUploadedImages {
 
-        /** @var Collection<int, Media> $medias_to_delete */
-        $medias_to_delete =
-            $model
-                ->medially
-                ->whereNotIn('id', $file_to_update_ids);
+        $unsaved_temporary_uploaded_image =
+            TemporaryUploadedImages::fromCloudinaryEagerUploadedImage(
+                $cloudinaryNotificationUrlRequestData,
+                $file_upload_directory
+            );
 
-        Log::info('media ids to delete {ids}', ['ids' => $medias_to_delete]);
+        return
+           Auth::User()
+               ->temporaryUploadedImages()
+               ->create(
+                   $unsaved_temporary_uploaded_image
+                       ->toArray()
+               );
 
-        $model->detachMedia($medias_to_delete);
-
-        /** @var Collection<int, string> $existing_media_ids */
-        $existing_media_ids =
-            $model
-                ->medially
-                ->pluck('id');
-
-        /** @var Collection<int, string> $media_to_add_urls */
-        $media_to_add_urls = $request_files->filter(
-            fn ($file) => ! $existing_media_ids->contains($file->uid)
-        )->pluck('url');
-
-        foreach ($media_to_add_urls as &$media_url) {
-            $model->attachRemoteMedia($media_url);
-        }
     }
 
     /**
-     * Delete all/one/multiple file(s) associated with a particular Model record
+     * @return TemporaryUploadedImages
      *
-     * @param  int[]|Collection<int, int>  $public_ids
-     * @return void
-     *
-     * @throws ApiError
+     * @throws FailedToDeleteImageException
      */
-    public function createMediaForModel(ModelAndMediable $model, array|Collection $public_ids)
+    public function deleteFileByPublicId(string $public_id)
     {
 
-        foreach ($public_ids as &$public_id) {
+        $public_id =
+             str_replace(
+                 '-',
+                 '/',
+                 $public_id
+             );
 
-            $cloud_image = Cloudinary::getImage($public_id);
+        DB::beginTransaction();
 
-            $cloud_image_url = $cloud_image->toUrl();
+        // if image is created before parent model is created (i.e on create page)
+        TemporaryUploadedImages::query()
+            ->firstWhere(
+                'public_id',
+                $public_id
+            )
+            ?->delete();
 
-            $model->attachRemoteMedia($cloud_image_url);
+        // // if image is created after parent model is created(i.e on update page)
+        Media::query()
+            ->firstWhere(
+                'public_id',
+                $public_id
+            )
+            ?->delete();
+
+        $media_has_been_deleted =
+            CloudUploadService::destroy(
+                $public_id
+            );
+
+        if (! $media_has_been_deleted) {
+
+            DB::rollBack();
+            throw new FailedToDeleteImageException;
         }
+
+        DB::commit();
+
     }
 
+    // mobile-offer specific methods
     /**
-     * Delete all/one/multiple file(s) associated with a particular Model record
+     * @return TemporaryUploadedImages
      */
-    public function removeAssociatedMediaForModel(ModelAndMediable $model): void
+    public function temporaryUploadMobileOfferImageFromCloudinaryNotification(CloudinaryNotificationUrlRequestData $cloudinaryNotificationUrlRequestData)
     {
-        FacadesLog::info('hello world');
-        $model->detachMedia();
+
+        return
+            $this
+                ->createTemporaryUploadedImageFromCloudinaryUploadSuccessNotification(
+                    $cloudinaryNotificationUrlRequestData,
+                    FileUploadDirectory::MOBILE_OFFERS
+                );
+
     }
 }

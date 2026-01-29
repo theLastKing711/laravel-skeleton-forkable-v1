@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\User\Auth;
 
 use App\Data\Shared\Swagger\Response\SuccessItemResponse;
-use App\Data\User\Auth\GetUserPhoneNumberResponseData;
+use App\Data\User\Auth\GetUserPhoneNumber\Response\GetUserPhoneNumberResponseData;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
